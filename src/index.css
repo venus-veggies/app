@@ -1,0 +1,198 @@
+@import "tailwindcss";
+
+/* Force light mode globally – override OS dark preference */
+
+html {
+  color-scheme: light;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Later, when dark mode is added, you'll do:
+   html.dark { color-scheme: dark; }
+   and Tailwind 'dark:' utilities will activate.
+*/
+
+/* ============================================================
+   DESIGN TOKENS — "Fresh & Organic"
+   Every color/radius/shadow below becomes a Tailwind utility
+   automatically (Tailwind v4 @theme), e.g.:
+     --color-leaf-500  -> bg-leaf-500 / text-leaf-500 / border-leaf-500
+     --radius-card     -> rounded-card
+     --font-display    -> font-display
+   ============================================================ */
+@theme {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-display: "Fraunces", serif;
+
+  /* neutrals — restored to the original palette */
+  --color-ink: #3d3833;
+  --color-body: #6b6560;
+  --color-muted: #9c958a;
+  --color-subtle: #b5afa5;
+  --color-page: #f9f8f5;
+  --color-surface: #ffffff;
+  --color-border: #ebe7e0;
+
+  /* leaf green — the original primary, unchanged */
+  --color-leaf-900: #24401e;
+  --color-leaf-700: #3a7e30;
+  --color-leaf-600: #3a7e30;
+  --color-leaf-500: #4a9e3f;
+  --color-leaf-400: #6baf5e;
+  --color-leaf-100: #e8f5e1;
+
+  /* a light warm accent — used sparingly (ratings, small highlights) */
+  --color-gold-600: #c3811f;
+  --color-gold-500: #e0a039;
+  --color-gold-100: #fbebcb;
+
+  /* kept for functional (destructive) UI only — not used as a marketing/badge tone */
+  --color-tomato-600: #b8431f;
+  --color-tomato-500: #d1552f;
+  --color-tomato-100: #f8dccf;
+
+  --radius-card: 1.25rem;
+  --radius-btn: 0.9rem;
+  --radius-pill: 999px;
+
+  --shadow-card:
+    0 1px 2px rgba(61, 54, 46, 0.06), 0 1px 1px rgba(61, 54, 46, 0.04);
+  --shadow-card-hover:
+    0 16px 32px -12px rgba(31, 61, 34, 0.18),
+    0 4px 10px -4px rgba(31, 61, 34, 0.08);
+  --shadow-float: 0 8px 24px -6px rgba(31, 61, 34, 0.28);
+}
+
+:root {
+  --topnav-height: 3.75rem;
+  --bottomnav-height: 4.25rem;
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--color-page);
+  color: var(--color-body);
+  font-family: var(--font-sans);
+}
+
+/* utility: hide scrollbar for horizontally-scrolling chip/card rows */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* utility: respect the phone's home-indicator / gesture area */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================
+   TYPOGRAPHY SYSTEM
+   One place to control every text style in the app. Use these
+   classes instead of ad-hoc font-size/weight combos on pages.
+   (Named "type-*" on purpose — "text-*" is already taken by the
+   color utilities Tailwind generates from --color-ink etc.)
+   ============================================================ */
+
+/* Page-level hero title — one per page, top of Products/Cart/etc */
+.type-hero {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.5rem;
+  line-height: 1.15;
+  color: var(--color-ink);
+}
+@media (min-width: 768px) {
+  .type-hero {
+    font-size: 1.875rem;
+  }
+}
+
+/* Section heading — "You might also like", "Order summary", etc */
+.type-section {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.125rem;
+  line-height: 1.25;
+  color: var(--color-ink);
+}
+@media (min-width: 768px) {
+  .type-section {
+    font-size: 1.25rem;
+  }
+}
+
+/* Small uppercase label above a heading — "Today's harvest", category tag */
+.type-eyebrow {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  color: var(--color-leaf-600);
+}
+
+/* Product/item name in cards, cart lines, lists */
+.type-name {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--color-ink);
+}
+
+/* Price — small (cards, cart lines) and large (product detail hero) */
+.type-price {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--color-leaf-700);
+  font-variant-numeric: tabular-nums;
+}
+.type-price-lg {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.5rem;
+  color: var(--color-leaf-700);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Paragraph copy — descriptions, form helper text */
+.type-body {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.625;
+  color: var(--color-body);
+}
+
+/* Smallest text — unit labels, timestamps, fine print */
+.type-caption {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 0.75rem;
+  color: var(--color-muted);
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--color-page),
+    0 0 0 4px var(--color-leaf-500);
+}
+
+img {
+  background-color: var(--color-leaf-100);
+}
