@@ -15,8 +15,12 @@ export default function ProductCard({ product, className = "" }) {
   const price = activeVariant ? parseFloat(activeVariant.current_price) : 0;
   const unit = activeVariant?.display_label ?? "";
 
-  const inCart =
-    lineItems.find((l) => l.product.slug === product.slug)?.qty ?? 0;
+  // Build the same key used in CartContext so we can count correctly
+  const itemKey = activeVariant
+    ? `${product.slug}_${activeVariant.id}`
+    : product.slug;
+
+  const inCart = lineItems.find((l) => l.key === itemKey)?.qty ?? 0;
 
   const handleAdd = (e) => {
     e.preventDefault();
