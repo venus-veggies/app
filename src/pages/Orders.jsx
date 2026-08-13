@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useOrders } from "../hooks/useOrders";
+import { SubPageHeader } from "../components/ui/SubPageHeader";
 import { ROUTES } from "../config/navigation";
 import { COPY } from "../config/copy";
 
@@ -45,7 +46,7 @@ export default function Orders() {
 
   return (
     <div className="pb-10">
-      <h1 className="type-hero mb-4">My Orders</h1>
+      <SubPageHeader title="My Orders" backTo={ROUTES.profile} />
 
       <div className="space-y-3">
         {orders.map((order) => (
