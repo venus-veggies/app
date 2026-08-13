@@ -51,7 +51,7 @@ export default function Orders() {
         {orders.map((order) => (
           <Link
             key={order.id}
-            to={`${ROUTES.orders.substring(1)}/${order.id}`}
+            to={`${ROUTES.orders}/${order.id}`}
             className="block bg-surface rounded-card shadow-card p-4 hover:shadow-card-hover transition-shadow"
           >
             <div className="flex items-center justify-between mb-2">

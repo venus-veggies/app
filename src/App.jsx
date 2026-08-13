@@ -53,7 +53,7 @@ export default function App() {
                     element={<Orders />}
                   />
                   <Route
-                    path={`${ROUTES.orders.substring(1)}/:id`}
+                    path={`${ROUTES.orders}/:id`}
                     element={<OrderDetail />}
                   />
                   <Route
