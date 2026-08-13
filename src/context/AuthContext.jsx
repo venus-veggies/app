@@ -55,12 +55,18 @@ export function AuthProvider({ children }) {
     setUser(null);
   }, []);
 
+  const updateProfile = useCallback(async (payload) => {
+    const { data } = await api.put("/profile", payload);
+    setUser(data.user);
+  }, []);
+
   const value = {
     user,
     loading,
     isAuthenticated: !!user,
     login,
     register,
+    updateProfile,
     logout,
   };
 

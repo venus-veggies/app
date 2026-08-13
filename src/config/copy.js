@@ -77,6 +77,14 @@ export const COPY = {
   quantityIncreaseAria: "Increase quantity",
   heroStartShopping: "Start shopping",
   heroSeeTodaysRate: "See today's rate",
+
+  addressTitle: "Delivery Address",
+  addressLine1Placeholder: "House no, street, area",
+  addressLine2Placeholder: "Colony, sector (optional)",
+  landmarkPlaceholder: "Landmark (optional)",
+  pincodePlaceholder: "Pincode",
+  saveAddress: "Save Address",
+  editAddress: "Edit",
 };
 
 // Helper to replace template placeholders like {{query}}
