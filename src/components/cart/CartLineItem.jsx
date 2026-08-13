@@ -2,8 +2,13 @@ import { X } from "lucide-react";
 import { QuantityStepper } from "../ui/QuantityStepper";
 
 export function CartLineItem({ product, qty, onRemove, onQtyChange }) {
-  const unit = product.variant?.display_label ?? "";
+  const unit = product.variant?.display_label ?? product.variant?.label ?? "";
   const imageSrc = product.image_url;
+
+  // Variant-aware key – same as CartContext
+  const itemKey = product.variant?.id
+    ? `${product.slug}_${product.variant.id}`
+    : product.slug;
 
   return (
     <div className="flex gap-3 bg-surface rounded-card p-3 shadow-card">
@@ -45,20 +50,21 @@ export function CartLineItem({ product, qty, onRemove, onQtyChange }) {
             <p className="type-caption mb-1.5">{unit}</p>
           </div>
           <button
-            onClick={() => onRemove(product.slug)}
+            onClick={() => onRemove(itemKey)}
             aria-label={`Remove ${product.name}`}
             className="text-muted hover:text-tomato-600 shrink-0"
           >
             <X size={16} />
           </button>
         </div>
+
         <div className="flex items-center justify-between">
           <span className="type-price">
             ₹{(product.price * qty).toFixed(0)}
           </span>
           <QuantityStepper
             value={qty}
-            onChange={(val) => onQtyChange(product.slug, val)}
+            onChange={(val) => onQtyChange(itemKey, val)}
           />
         </div>
       </div>

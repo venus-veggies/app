@@ -1,15 +1,26 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { ShoppingBasket } from "lucide-react";
 import toast from "react-hot-toast";
 import { useCart } from "../context/CartContext";
 import { CartLineItem } from "../components/cart/CartLineItem";
 import { OrderSummary } from "../components/cart/OrderSummary";
 import { Button } from "../components/ui/Button";
+import { placeOrder } from "../data/orders";
 import { ROUTES } from "../config/navigation";
 import { COPY } from "../config/copy";
 
 export default function Cart() {
   const { lineItems, subtotal, setQty, removeItem, clearCart } = useCart();
+  const navigate = useNavigate();
+
+  const [address, setAddress] = useState({
+    address_line1: "",
+    address_line2: "",
+    landmark: "",
+    pincode: "",
+  });
+  const [placing, setPlacing] = useState(false);
 
   if (lineItems.length === 0) {
     return (
@@ -26,14 +37,56 @@ export default function Cart() {
     );
   }
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!address.address_line1.trim() || !address.pincode.trim()) {
+      toast.error("Please provide address and pincode.");
+      return;
+    }
+
+    // Build order items from cart
+    const items = lineItems.map(({ product, qty }) => ({
+      product_variant_id: product.variant?.id,
+      quantity: qty,
+    }));
+
+    if (items.some((i) => !i.product_variant_id)) {
+      toast.error(
+        "Some items are missing variant info. Please remove and re-add them.",
+      );
+      return;
+    }
+
+    setPlacing(true);
+    try {
+      await placeOrder({
+        address_line1: address.address_line1,
+        address_line2: address.address_line2,
+        landmark: address.landmark,
+        pincode: address.pincode,
+        payment_method: "cod",
+        items,
+      });
+
+      clearCart();
+      toast.success("Order placed successfully!");
+      navigate(ROUTES.orders);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to place order");
+    } finally {
+      setPlacing(false);
+    }
+  };
+
   return (
     <div className="pb-8">
       <h1 className="type-hero mb-4">{COPY.cartTitle}</h1>
 
       <div className="flex flex-col gap-3 mb-5">
-        {lineItems.map(({ product, qty }) => (
+        {lineItems.map(({ key, product, qty }) => (
           <CartLineItem
-            key={product.slug}
+            key={key}
             product={product}
             qty={qty}
             onRemove={removeItem}
@@ -44,12 +97,51 @@ export default function Cart() {
 
       <OrderSummary subtotal={subtotal} />
 
-      <Button
-        className="w-full py-3"
-        onClick={() => toast(COPY.cartCheckoutNotWired)}
+      <form
+        onSubmit={handleSubmit}
+        className="bg-surface rounded-card shadow-card p-4 mb-4 space-y-3"
       >
-        {COPY.cartCheckout}
-      </Button>
+        <h2 className="type-section">Delivery Address</h2>
+
+        <input
+          value={address.address_line1}
+          onChange={(e) =>
+            setAddress({ ...address, address_line1: e.target.value })
+          }
+          placeholder="House no, street, area"
+          className="w-full border border-border rounded-btn px-3 py-2.5 text-sm outline-none placeholder:text-muted"
+          required
+        />
+
+        <input
+          value={address.address_line2}
+          onChange={(e) =>
+            setAddress({ ...address, address_line2: e.target.value })
+          }
+          placeholder="Colony, sector (optional)"
+          className="w-full border border-border rounded-btn px-3 py-2.5 text-sm outline-none placeholder:text-muted"
+        />
+
+        <input
+          value={address.landmark}
+          onChange={(e) => setAddress({ ...address, landmark: e.target.value })}
+          placeholder="Landmark (optional)"
+          className="w-full border border-border rounded-btn px-3 py-2.5 text-sm outline-none placeholder:text-muted"
+        />
+
+        <input
+          value={address.pincode}
+          onChange={(e) => setAddress({ ...address, pincode: e.target.value })}
+          placeholder="Pincode"
+          type="tel"
+          className="w-full border border-border rounded-btn px-3 py-2.5 text-sm outline-none placeholder:text-muted"
+          required
+        />
+
+        <Button type="submit" className="w-full py-3" disabled={placing}>
+          {placing ? "Placing order…" : COPY.cartCheckout}
+        </Button>
+      </form>
 
       {lineItems.length > 0 && (
         <button
