@@ -184,9 +184,15 @@ export default function Profile() {
           return (
             <button
               key={key}
-              onClick={() =>
-                toast(COPY.menuNotWired.replace("{{label}}", label))
-              }
+              onClick={() => {
+                if (key === "orders") {
+                  navigate(ROUTES.orders);
+                } else if (key === "addresses") {
+                  setEditing(true);
+                } else {
+                  toast(COPY.menuNotWired.replace("{{label}}", label));
+                }
+              }}
               className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-page transition-colors"
             >
               {Icon && <Icon size={18} className="text-leaf-700 shrink-0" />}
