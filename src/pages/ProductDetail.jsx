@@ -74,6 +74,7 @@ export default function ProductDetail() {
   const tagName = product.tags?.[0]?.name;
 
   const handleAdd = () => {
+    if (!selectedVariant) return;
     addToCart(
       {
         slug: product.slug,
@@ -179,9 +180,15 @@ export default function ProductDetail() {
 
       <div className="fixed bottom-[var(--bottomnav-height)] md:bottom-0 inset-x-0 z-30 bg-surface/95 backdrop-blur border-t border-border p-3 safe-bottom">
         <div className="max-w-6xl mx-auto">
-          <Button className="w-full py-3" onClick={handleAdd}>
-            Add {qty > 1 ? `${qty} ` : ""}to cart · ₹{price * qty}
-          </Button>
+          {activeVariants.length > 0 ? (
+            <Button className="w-full py-3" onClick={handleAdd}>
+              Add {qty > 1 ? `${qty} ` : ""}to cart · ₹{price * qty}
+            </Button>
+          ) : (
+            <div className="text-center text-sm text-tomato-600 bg-tomato-100 rounded-btn py-3">
+              Currently unavailable
+            </div>
+          )}
         </div>
       </div>
     </div>
