@@ -10,6 +10,7 @@ import Cart from "./pages/Cart";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import Orders from "./pages/Orders";
+import OrderDetail from "./pages/OrderDetail";
 import NotFound from "./pages/NotFound";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ROUTES } from "./config/navigation";
@@ -50,6 +51,10 @@ export default function App() {
                   <Route
                     path={ROUTES.orders.substring(1)}
                     element={<Orders />}
+                  />
+                  <Route
+                    path={`${ROUTES.orders.substring(1)}/:id`}
+                    element={<OrderDetail />}
                   />
                   <Route
                     path={ROUTES.profile.substring(1)}

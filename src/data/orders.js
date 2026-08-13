@@ -11,3 +11,8 @@ export async function placeOrder(payload) {
   const { data } = await api.post("/orders", payload);
   return data;
 }
+
+export async function getOrderById(id) {
+  const { data } = await api.get(`/orders/${id}`);
+  return data.data ?? data;
+}
