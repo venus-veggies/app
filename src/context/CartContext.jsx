@@ -9,17 +9,15 @@ import {
 import { useAuth } from "./AuthContext";
 
 const CartContext = createContext(null);
-
 const GUEST_KEY = "cart_guest";
 
 export function CartProvider({ children }) {
   const { user } = useAuth();
   const [items, setItems] = useState({});
 
-  // Determine which localStorage key to use
   const storageKey = user ? `cart_${user.id}` : GUEST_KEY;
 
-  // Load cart from storage when key changes (including guest)
+  // Load cart from storage when key changes
   useEffect(() => {
     try {
       const saved = localStorage.getItem(storageKey);
@@ -70,11 +68,16 @@ export function CartProvider({ children }) {
     }
   }, [user]);
 
-  const addItem = useCallback((product, qty = 1) => {
+  // Add item – variant-aware
+  const addItem = useCallback((product, qty = 1, selectedVariant = null) => {
     setItems((prev) => {
-      const key = product.slug; // <-- slug, not id
+      // Use a unique key: product slug + variant id if variant exists
+      const variant = selectedVariant || product.variant || null;
+      const key = variant?.id ? `${product.slug}_${variant.id}` : product.slug;
+
       const existing = prev[key];
       const nextQty = (existing?.qty ?? 0) + qty;
+
       return {
         ...prev,
         [key]: {
@@ -82,8 +85,17 @@ export function CartProvider({ children }) {
             slug: product.slug,
             name: product.name,
             image_url: product.image_url,
-            price: product.price,
-            variant: product.variant,
+            // Use variant price if available; otherwise product.price
+            price: variant?.current_price ?? product.price ?? 0,
+            // Keep enough variant info for API order submission
+            variant: variant
+              ? {
+                  id: variant.id,
+                  label: variant.display_label || variant.label || null,
+                  price: variant.current_price ?? variant.price ?? null,
+                  unit: variant.quantity_unit || variant.unit || null,
+                }
+              : null,
           },
           qty: nextQty,
         },
@@ -91,21 +103,22 @@ export function CartProvider({ children }) {
     });
   }, []);
 
-  const setQty = useCallback((productSlug, qty) => {
-    // <-- takes slug
+  const setQty = useCallback((itemKey, qty) => {
     setItems((prev) => {
       if (qty <= 0) {
-        const { [productSlug]: _drop, ...rest } = prev;
+        const { [itemKey]: _drop, ...rest } = prev;
         return rest;
       }
-      return { ...prev, [productSlug]: { ...prev[productSlug], qty } };
+      return {
+        ...prev,
+        [itemKey]: { ...prev[itemKey], qty },
+      };
     });
   }, []);
 
-  const removeItem = useCallback((productSlug) => {
-    // <-- takes slug
+  const removeItem = useCallback((itemKey) => {
     setItems((prev) => {
-      const { [productSlug]: _drop, ...rest } = prev;
+      const { [itemKey]: _drop, ...rest } = prev;
       return rest;
     });
   }, []);
@@ -114,11 +127,20 @@ export function CartProvider({ children }) {
     setItems({});
   }, []);
 
-  const lineItems = useMemo(() => Object.values(items), [items]);
+  const lineItems = useMemo(
+    () =>
+      Object.entries(items).map(([key, entry]) => ({
+        key,
+        ...entry,
+      })),
+    [items],
+  );
+
   const totalCount = useMemo(
     () => lineItems.reduce((sum, l) => sum + l.qty, 0),
     [lineItems],
   );
+
   const subtotal = useMemo(
     () => lineItems.reduce((sum, l) => sum + l.qty * (l.product.price ?? 0), 0),
     [lineItems],
