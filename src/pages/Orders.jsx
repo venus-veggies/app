@@ -49,9 +49,10 @@ export default function Orders() {
 
       <div className="space-y-3">
         {orders.map((order) => (
-          <div
+          <Link
             key={order.id}
-            className="bg-surface rounded-card shadow-card p-4"
+            to={`${ROUTES.orders.substring(1)}/${order.id}`}
+            className="block bg-surface rounded-card shadow-card p-4 hover:shadow-card-hover transition-shadow"
           >
             <div className="flex items-center justify-between mb-2">
               <span className="font-medium text-ink">Order #{order.id}</span>
@@ -77,7 +78,7 @@ export default function Orders() {
                 ₹{order.total}
               </span>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>
