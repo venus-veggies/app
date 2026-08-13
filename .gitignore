@@ -1,4 +1,4 @@
-cat > .gitignore << 'EOF'
+
 # Logs
 logs
 *.log
@@ -33,4 +33,5 @@ dist-ssr
 
 # AI extracts (regenerated locally)
 extracts/
-EOF
+
+/ui-prototype/
