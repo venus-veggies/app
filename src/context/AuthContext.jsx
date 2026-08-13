@@ -20,6 +20,7 @@ export function AuthProvider({ children }) {
       setLoading(false);
       return;
     }
+
     api
       .get("/me")
       .then(({ data }) => {
@@ -27,6 +28,7 @@ export function AuthProvider({ children }) {
       })
       .catch(() => {
         localStorage.removeItem("token");
+        setUser(null);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -37,11 +39,17 @@ export function AuthProvider({ children }) {
     setUser(data.user);
   }, []);
 
+  const register = useCallback(async (payload) => {
+    const { data } = await api.post("/register", payload);
+    localStorage.setItem("token", data.token);
+    setUser(data.user);
+  }, []);
+
   const logout = useCallback(async () => {
     try {
       await api.post("/logout");
     } catch {
-      // ignore logout errors
+      // ignore logout errors – token is removed regardless
     }
     localStorage.removeItem("token");
     setUser(null);
@@ -52,6 +60,7 @@ export function AuthProvider({ children }) {
     loading,
     isAuthenticated: !!user,
     login,
+    register,
     logout,
   };
 
