@@ -12,14 +12,19 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
-  const { login } = useAuth();
+  const { login, register } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+
     try {
-      await login({ phone, password });
+      if (mode === "login") {
+        await login({ phone, password });
+      } else {
+        await register({ name, phone, password });
+      }
       navigate(ROUTES.shop);
     } catch (err) {
       const message = err.response?.data?.message || COPY.loginFailed;
