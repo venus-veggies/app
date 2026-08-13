@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChevronLeft, Truck, Leaf as LeafIcon, Hand } from "lucide-react";
+import { Truck, Leaf as LeafIcon, Hand } from "lucide-react";
 import { QuantityStepper } from "../components/ui/QuantityStepper";
 import { Button } from "../components/ui/Button";
+import { SubPageHeader } from "../components/ui/SubPageHeader";
 import { ProduceBadge } from "../components/product";
 import { getProducts } from "../data/products";
 import { useProduct } from "../hooks/useProduct";
@@ -89,6 +90,8 @@ export default function ProductDetail() {
 
   return (
     <div className="pb-6">
+      <SubPageHeader title={product.name} backTo={ROUTES.shop} />
+
       <div className="relative -mx-4 -mt-4 md:mx-0 md:mt-0 md:rounded-card overflow-hidden h-64 md:h-72 bg-leaf-100/60">
         {product.image_url ? (
           <img
@@ -112,13 +115,6 @@ export default function ProductDetail() {
             </svg>
           </div>
         )}
-        <button
-          onClick={() => navigate(-1)}
-          aria-label={COPY.goBackAria}
-          className="absolute top-4 left-4 w-9 h-9 rounded-full bg-surface/90 backdrop-blur flex items-center justify-center shadow-card"
-        >
-          <ChevronLeft size={20} className="text-ink" />
-        </button>
         {tagName && (
           <ProduceBadge
             label={tagName}

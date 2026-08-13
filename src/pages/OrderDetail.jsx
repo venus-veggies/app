@@ -1,8 +1,7 @@
-import { useParams, Link } from "react-router-dom";
-import { ChevronLeft } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useOrder } from "../hooks/useOrder";
+import { SubPageHeader } from "../components/ui/SubPageHeader";
 import { ROUTES } from "../config/navigation";
-import { COPY } from "../config/copy";
 
 const statusStyles = {
   pending: "bg-amber-100 text-amber-700",
@@ -36,22 +35,22 @@ export default function OrderDetail() {
 
   return (
     <div className="pb-8">
-      <Link
-        to={ROUTES.orders}
-        className="inline-flex items-center gap-1 text-sm text-leaf-700 mb-4"
-      >
-        <ChevronLeft size={16} />
-        My Orders
-      </Link>
+      <SubPageHeader title={`Order #${order.id}`} backTo={ROUTES.orders} />
 
       <div className="flex items-center justify-between mb-4">
-        <h1 className="type-hero">Order #{order.id}</h1>
         <span
           className={`text-xs font-medium px-2 py-0.5 rounded-pill ${
             statusStyles[order.status] || "bg-surface-secondary text-text-body"
           }`}
         >
           {order.status}
+        </span>
+        <span className="text-sm text-muted">
+          {new Date(order.ordered_at).toLocaleDateString("en-IN", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          })}
         </span>
       </div>
 
@@ -113,14 +112,6 @@ export default function OrderDetail() {
       <div className="bg-surface rounded-card shadow-card p-4">
         <h2 className="type-section mb-2">Delivery Address</h2>
         <p className="text-sm text-body">{order.address || "—"}</p>
-        <p className="text-xs text-muted mt-1">
-          Ordered on{" "}
-          {new Date(order.ordered_at).toLocaleDateString("en-IN", {
-            day: "numeric",
-            month: "short",
-            year: "numeric",
-          })}
-        </p>
       </div>
     </div>
   );
