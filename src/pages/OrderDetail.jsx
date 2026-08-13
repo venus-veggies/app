@@ -59,11 +59,26 @@ export default function OrderDetail() {
         <h2 className="type-section mb-2">Items</h2>
         <div className="divide-y divide-border">
           {order.items?.map((item, idx) => (
-            <div key={idx} className="flex justify-between py-2 text-sm">
-              <div>
-                <p className="text-ink font-medium">{item.product_name}</p>
+            <div key={idx} className="flex items-center gap-3 py-2 text-sm">
+              {item.image_url ? (
+                <img
+                  src={item.image_url}
+                  alt={item.product_name}
+                  className="w-12 h-12 rounded-btn object-cover bg-leaf-100"
+                />
+              ) : (
+                <div className="w-12 h-12 rounded-btn bg-leaf-100 flex items-center justify-center text-leaf-600 font-bold text-lg">
+                  {item.product_name?.charAt(0) ?? "?"}
+                </div>
+              )}
+
+              <div className="flex-1 min-w-0">
+                <p className="text-ink font-medium truncate">
+                  {item.product_name}
+                </p>
                 <p className="text-muted text-xs">Qty: {item.quantity}</p>
               </div>
+
               <div className="text-right">
                 <p className="text-body">₹{item.total_price}</p>
                 <p className="text-muted text-xs">₹{item.unit_price} each</p>
