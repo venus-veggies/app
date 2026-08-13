@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingBasket } from "lucide-react";
+import { ShoppingBasket, Pencil } from "lucide-react";
 import toast from "react-hot-toast";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import { CartLineItem } from "../components/cart/CartLineItem";
 import { OrderSummary } from "../components/cart/OrderSummary";
 import { Button } from "../components/ui/Button";
@@ -12,14 +13,19 @@ import { COPY } from "../config/copy";
 
 export default function Cart() {
   const { lineItems, subtotal, setQty, removeItem, clearCart } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [address, setAddress] = useState({
-    address_line1: "",
-    address_line2: "",
-    landmark: "",
-    pincode: "",
+    address_line1: user?.address_line1 || "",
+    address_line2: user?.address_line2 || "",
+    landmark: user?.landmark || "",
+    pincode: user?.pincode || "",
   });
+
+  const [showAddressForm, setShowAddressForm] = useState(
+    !user?.address_line1 || !user?.pincode,
+  );
   const [placing, setPlacing] = useState(false);
 
   if (lineItems.length === 0) {
@@ -42,10 +48,10 @@ export default function Cart() {
 
     if (!address.address_line1.trim() || !address.pincode.trim()) {
       toast.error("Please provide address and pincode.");
+      setShowAddressForm(true);
       return;
     }
 
-    // Build order items from cart
     const items = lineItems.map(({ product, qty }) => ({
       product_variant_id: product.variant?.id,
       quantity: qty,
@@ -101,42 +107,65 @@ export default function Cart() {
         onSubmit={handleSubmit}
         className="bg-surface rounded-card shadow-card p-4 mb-4 space-y-3"
       >
-        <h2 className="type-section">Delivery Address</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="type-section">Delivery Address</h2>
+          {!showAddressForm && (
+            <button
+              type="button"
+              onClick={() => setShowAddressForm(true)}
+              className="text-sm text-leaf-700 flex items-center gap-1"
+            >
+              <Pencil size={14} /> Change
+            </button>
+          )}
+        </div>
 
-        <input
-          value={address.address_line1}
-          onChange={(e) =>
-            setAddress({ ...address, address_line1: e.target.value })
-          }
-          placeholder="House no, street, area"
-          className="w-full border border-border rounded-btn px-3 py-2.5 text-sm outline-none placeholder:text-muted"
-          required
-        />
-
-        <input
-          value={address.address_line2}
-          onChange={(e) =>
-            setAddress({ ...address, address_line2: e.target.value })
-          }
-          placeholder="Colony, sector (optional)"
-          className="w-full border border-border rounded-btn px-3 py-2.5 text-sm outline-none placeholder:text-muted"
-        />
-
-        <input
-          value={address.landmark}
-          onChange={(e) => setAddress({ ...address, landmark: e.target.value })}
-          placeholder="Landmark (optional)"
-          className="w-full border border-border rounded-btn px-3 py-2.5 text-sm outline-none placeholder:text-muted"
-        />
-
-        <input
-          value={address.pincode}
-          onChange={(e) => setAddress({ ...address, pincode: e.target.value })}
-          placeholder="Pincode"
-          type="tel"
-          className="w-full border border-border rounded-btn px-3 py-2.5 text-sm outline-none placeholder:text-muted"
-          required
-        />
+        {showAddressForm ? (
+          <>
+            <input
+              value={address.address_line1}
+              onChange={(e) =>
+                setAddress({ ...address, address_line1: e.target.value })
+              }
+              placeholder="House no, street, area"
+              className="w-full border border-border rounded-btn px-3 py-2.5 text-sm outline-none placeholder:text-muted"
+              required
+            />
+            <input
+              value={address.address_line2}
+              onChange={(e) =>
+                setAddress({ ...address, address_line2: e.target.value })
+              }
+              placeholder="Colony, sector (optional)"
+              className="w-full border border-border rounded-btn px-3 py-2.5 text-sm outline-none placeholder:text-muted"
+            />
+            <input
+              value={address.landmark}
+              onChange={(e) =>
+                setAddress({ ...address, landmark: e.target.value })
+              }
+              placeholder="Landmark (optional)"
+              className="w-full border border-border rounded-btn px-3 py-2.5 text-sm outline-none placeholder:text-muted"
+            />
+            <input
+              value={address.pincode}
+              onChange={(e) =>
+                setAddress({ ...address, pincode: e.target.value })
+              }
+              placeholder="Pincode"
+              type="tel"
+              className="w-full border border-border rounded-btn px-3 py-2.5 text-sm outline-none placeholder:text-muted"
+              required
+            />
+          </>
+        ) : (
+          <div className="text-sm text-body bg-leaf-100/60 rounded-btn p-3">
+            <p>{address.address_line1}</p>
+            {address.address_line2 && <p>{address.address_line2}</p>}
+            {address.landmark && <p>{address.landmark}</p>}
+            <p className="font-medium">{address.pincode}</p>
+          </div>
+        )}
 
         <Button type="submit" className="w-full py-3" disabled={placing}>
           {placing ? "Placing order…" : COPY.cartCheckout}
