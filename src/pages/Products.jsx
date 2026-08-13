@@ -26,6 +26,11 @@ export default function Products() {
       .catch(() => setCatError(COPY.productsLoadingError));
   }, []);
 
+  // Only show products that have at least one active variant
+  const availableProducts = products.filter((product) =>
+    product.variants?.some((v) => v.status === "active"),
+  );
+
   return (
     <div>
       <Hero />
@@ -93,9 +98,9 @@ export default function Products() {
             {COPY.reloadPage}
           </button>
         </div>
-      ) : products.length > 0 ? (
+      ) : availableProducts.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
-          {products.map((product) => (
+          {availableProducts.map((product) => (
             <ProductCard key={product.slug} product={product} />
           ))}
         </div>
