@@ -1,5 +1,7 @@
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useOrder } from "../hooks/useOrder";
+import { useCart } from "../context/CartContext";
+import toast from "react-hot-toast";
 import { SubPageHeader } from "../components/ui/SubPageHeader";
 import { ROUTES } from "../config/navigation";
 
@@ -12,6 +14,30 @@ const statusStyles = {
 export default function OrderDetail() {
   const { id } = useParams();
   const { order, loading, error } = useOrder(id);
+  const { addItem } = useCart();
+
+  const handleReorder = () => {
+    if (!order?.items?.length) return;
+
+    order.items.forEach((item) => {
+      if (item.product_slug && item.product_variant_id) {
+        addItem(
+          {
+            slug: item.product_slug,
+            name: item.product_name,
+            image_url: item.image_url,
+            price: parseFloat(item.unit_price),
+            variant: item.variant || null,
+          },
+          item.quantity,
+        );
+      }
+    });
+
+    toast.success("Items added to cart");
+    // optional: navigate to cart
+    // navigate(ROUTES.cart);
+  };
 
   if (loading) {
     return (
@@ -54,6 +80,13 @@ export default function OrderDetail() {
         </span>
       </div>
 
+      <button
+        onClick={handleReorder}
+        className="w-full mb-4 py-3 rounded-btn bg-leaf-500 text-white font-medium"
+      >
+        Reorder
+      </button>
+
       <div className="bg-surface rounded-card shadow-card p-4 mb-4">
         <h2 className="type-section mb-2">Items</h2>
         <div className="divide-y divide-border">
@@ -75,7 +108,9 @@ export default function OrderDetail() {
                 <p className="text-ink font-medium truncate">
                   {item.product_name}
                 </p>
-                <p className="text-muted text-xs">Qty: {item.quantity}</p>
+                <p className="text-muted text-xs">
+                  {item.variant?.display_label || ""} · Qty: {item.quantity}
+                </p>
               </div>
 
               <div className="text-right">
