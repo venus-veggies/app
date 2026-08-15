@@ -4,6 +4,7 @@ import { useCart } from "../context/CartContext";
 import toast from "react-hot-toast";
 import { SubPageHeader } from "../components/ui/SubPageHeader";
 import { ROUTES } from "../config/navigation";
+import { RotateCcw } from "lucide-react";
 
 const statusStyles = {
   pending: "bg-amber-100 text-amber-700",
@@ -61,9 +62,31 @@ export default function OrderDetail() {
 
   return (
     <div className="pb-8">
-      <SubPageHeader title={`Order #${order.id}`} backTo={ROUTES.orders} />
+      <SubPageHeader
+        title={`Order #${order.id}`}
+        backTo={ROUTES.orders}
+        action={
+          <div className="hidden md:flex items-center gap-2">
+            <span
+              className={`text-xs font-medium px-2 py-0.5 rounded-pill ${
+                statusStyles[order.status] ||
+                "bg-surface-secondary text-text-body"
+              }`}
+            >
+              {order.status}
+            </span>
+            <span className="text-xs text-muted">
+              {new Date(order.ordered_at).toLocaleDateString("en-IN", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              })}
+            </span>
+          </div>
+        }
+      />
 
-      <div className="flex items-center justify-between mb-4">
+      <div className="md:hidden flex items-center justify-between mb-3">
         <span
           className={`text-xs font-medium px-2 py-0.5 rounded-pill ${
             statusStyles[order.status] || "bg-surface-secondary text-text-body"
@@ -71,7 +94,7 @@ export default function OrderDetail() {
         >
           {order.status}
         </span>
-        <span className="text-sm text-muted">
+        <span className="text-xs text-muted">
           {new Date(order.ordered_at).toLocaleDateString("en-IN", {
             day: "numeric",
             month: "short",
@@ -82,11 +105,11 @@ export default function OrderDetail() {
 
       <button
         onClick={handleReorder}
-        className="w-full mb-4 py-3 rounded-btn bg-leaf-500 text-white font-medium"
+        className="w-full md:w-auto mb-4 py-2.5 px-4 rounded-btn border border-leaf-200 bg-surface text-leaf-700 text-sm font-medium flex items-center justify-center gap-2 hover:bg-leaf-100 active:scale-[0.99] transition"
       >
+        <RotateCcw size={15} strokeWidth={2} />
         Reorder
       </button>
-
       <div className="bg-surface rounded-card shadow-card p-4 mb-4">
         <h2 className="type-section mb-2">Items</h2>
         <div className="divide-y divide-border">
