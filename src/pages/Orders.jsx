@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Sprout } from "lucide-react";
 import { useOrders } from "../hooks/useOrders";
 import { SubPageHeader } from "../components/ui/SubPageHeader";
 import { ROUTES } from "../config/navigation";
@@ -48,7 +49,7 @@ export default function Orders() {
     <div className="pb-10">
       <SubPageHeader title="My Orders" backTo={ROUTES.profile} />
 
-      <div className="space-y-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
         {orders.map((order) => (
           <Link
             key={order.id}
@@ -80,7 +81,7 @@ export default function Orders() {
               </span>
             </div>
 
-            {order.thumbnails?.length > 0 && (
+            {order.thumbnails?.length > 0 ? (
               <div className="flex -space-x-2 mt-3">
                 {order.thumbnails.slice(0, 3).map((url, i) => (
                   <img
@@ -90,6 +91,12 @@ export default function Orders() {
                     className="w-8 h-8 rounded-full border-2 border-surface object-cover"
                   />
                 ))}
+              </div>
+            ) : (
+              <div className="flex -space-x-2 mt-3">
+                <div className="w-8 h-8 rounded-full border-2 border-surface bg-leaf-100 flex items-center justify-center">
+                  <Sprout size={14} className="text-leaf-600" />
+                </div>
               </div>
             )}
           </Link>
