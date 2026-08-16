@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Search, SlidersHorizontal, Sprout } from "lucide-react";
 import { getCategories } from "../data/categories";
 import { useProducts } from "../hooks/useProducts";
@@ -8,7 +9,10 @@ import useDocumentTitle from "../hooks/useDocumentTitle";
 import { COPY, tpl } from "../config/copy";
 
 export default function Products() {
-  const [query, setQuery] = useState("");
+  const [searchParams] = useSearchParams();
+  const initialSearch = searchParams.get("search") || "";
+  const [query, setQuery] = useState(initialSearch);
+
   const [selectedCategory, setSelectedCategory] = useState("");
   const [categories, setCategories] = useState([]);
   const [catError, setCatError] = useState(null);
@@ -26,7 +30,10 @@ export default function Products() {
       .catch(() => setCatError(COPY.productsLoadingError));
   }, []);
 
-  // Only show products that have at least one active variant
+  useEffect(() => {
+    setQuery(searchParams.get("search") || "");
+  }, [searchParams]);
+
   const availableProducts = products.filter((product) =>
     product.variants?.some((v) => v.status === "active"),
   );
