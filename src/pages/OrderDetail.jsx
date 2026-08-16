@@ -67,7 +67,7 @@ export default function OrderDetail() {
         title={`Order #${order.id}`}
         backTo={ROUTES.orders}
         action={
-          <div className="hidden lg:flex items-center gap-2">
+          <div className="hidden lg:flex items-center gap-3">
             <span
               className={`text-xs font-medium px-2 py-0.5 rounded-pill ${
                 statusStyles[order.status] ||
@@ -83,6 +83,13 @@ export default function OrderDetail() {
                 year: "numeric",
               })}
             </span>
+            <button
+              onClick={handleReorder}
+              className="flex items-center gap-1.5 text-sm text-leaf-700 border border-leaf-200 rounded-btn px-3 py-1.5 hover:bg-leaf-100 active:scale-95 transition-all"
+            >
+              <RotateCcw size={14} strokeWidth={2} />
+              Reorder
+            </button>
           </div>
         }
       />
@@ -104,9 +111,10 @@ export default function OrderDetail() {
         </span>
       </div>
 
+      {/* Mobile reorder button */}
       <button
         onClick={handleReorder}
-        className="w-full lg:w-auto mb-4 py-2.5 px-4 rounded-btn border border-leaf-200 bg-surface text-leaf-700 text-sm font-medium flex items-center justify-center gap-2 hover:bg-leaf-100 active:scale-95 transition-all"
+        className="lg:hidden w-full mb-4 py-2.5 px-4 rounded-btn border border-leaf-200 bg-surface text-leaf-700 text-sm font-medium flex items-center justify-center gap-2 hover:bg-leaf-100 active:scale-95 transition-all"
       >
         <RotateCcw size={15} strokeWidth={2} />
         Reorder
