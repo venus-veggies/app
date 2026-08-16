@@ -103,7 +103,7 @@ export default function OrderDetail() {
 
       <button
         onClick={handleReorder}
-        className="w-full lg:w-auto mb-4 py-2.5 px-4 rounded-btn border border-leaf-200 bg-surface text-leaf-700 text-sm font-medium flex items-center justify-center gap-2 hover:bg-leaf-100 active:scale-[0.99] transition"
+        className="w-full lg:w-auto mb-4 py-2.5 px-4 rounded-btn border border-leaf-200 bg-surface text-leaf-700 text-sm font-medium flex items-center justify-center gap-2 hover:bg-leaf-100 active:scale-95 transition-all"
       >
         <RotateCcw size={15} strokeWidth={2} />
         Reorder

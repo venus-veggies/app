@@ -54,10 +54,8 @@ export function CartLineItem({ product, qty, onRemove, onQtyChange }) {
           <button
             onClick={() => onRemove(itemKey)}
             aria-label={`Remove ${product.name}`}
-            className="text-muted hover:text-tomato-600 shrink-0"
-          >
-            <X size={16} />
-          </button>
+            className="text-muted hover:text-tomato-600 shrink-0 transition-colors active:scale-90"
+          ></button>
         </div>
 
         <div className="flex items-center justify-between">

@@ -114,10 +114,9 @@ export default function Login() {
             {error && (
               <p className="text-tomato-600 text-sm text-center">{error}</p>
             )}
-
             <button
               type="submit"
-              className="mt-2 bg-leaf-500 hover:bg-leaf-600 text-white font-medium rounded-pill py-3 transition-colors"
+              className="mt-2 bg-leaf-500 hover:bg-leaf-600 text-white font-medium rounded-pill py-3 transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf-500"
             >
               {tabLabel}
             </button>

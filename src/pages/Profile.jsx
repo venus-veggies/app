@@ -86,10 +86,8 @@ export default function Profile() {
         <button
           onClick={() => setEditing((e) => !e)}
           aria-label={COPY.editProfileAria}
-          className="ml-auto w-9 h-9 rounded-full bg-leaf-100 flex items-center justify-center shrink-0"
-        >
-          <Pencil size={15} className="text-leaf-700" />
-        </button>
+          className="ml-auto w-9 h-9 rounded-full bg-leaf-100 flex items-center justify-center shrink-0 transition-transform active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf-300"
+        ></button>
       </div>
 
       {/* Address card */}
