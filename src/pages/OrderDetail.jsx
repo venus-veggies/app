@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { RotateCcw, Sprout } from "lucide-react";
 import { useOrder } from "../hooks/useOrder";
 import { useCart } from "../context/CartContext";
@@ -17,6 +17,7 @@ export default function OrderDetail() {
   const { id } = useParams();
   const { order, loading, error } = useOrder(id);
   const { addItem } = useCart();
+  const navigate = useNavigate();
 
   const handleReorder = () => {
     if (!order?.items?.length) return;
@@ -37,6 +38,7 @@ export default function OrderDetail() {
     });
 
     toast.success("Items added to cart");
+    navigate(ROUTES.cart);
   };
 
   if (loading) {
