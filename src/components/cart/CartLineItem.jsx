@@ -46,7 +46,9 @@ export function CartLineItem({ product, qty, onRemove, onQtyChange }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <h3 className="type-name truncate">{product.name}</h3>
+            <h3 className="type-name line-clamp-2 leading-snug">
+              {product.name}
+            </h3>
             <p className="type-caption mb-1.5">{unit}</p>
           </div>
           <button

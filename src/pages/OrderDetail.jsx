@@ -128,7 +128,7 @@ export default function OrderDetail() {
               )}
 
               <div className="flex-1 min-w-0">
-                <p className="text-ink font-medium truncate">
+                <p className="text-ink font-medium line-clamp-2 leading-snug">
                   {item.product_name}
                 </p>
                 <p className="text-muted text-xs">
