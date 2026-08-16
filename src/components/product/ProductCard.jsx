@@ -44,7 +44,7 @@ export default function ProductCard({ product, className = "" }) {
   return (
     <Link
       to={productPath(product.slug)}
-      className={`group block bg-surface rounded-card shadow-card hover:shadow-card-hover transition-shadow overflow-hidden ${className}`}
+      className={`group block bg-surface rounded-card shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1 overflow-hidden ${className}`}
     >
       <div className="relative aspect-square bg-leaf-100/60 overflow-hidden">
         {product.image_url && !imgError ? (
