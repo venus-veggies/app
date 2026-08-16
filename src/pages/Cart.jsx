@@ -176,7 +176,9 @@ export default function Cart() {
         <button
           onClick={() => clearCart()}
           className="w-full text-center text-sm text-tomato-600 mt-2 underline underline-offset-2 transition-colors hover:text-tomato-500 active:scale-95"
-        ></button>
+        >
+          {COPY.cartClear}
+        </button>
       )}
     </div>
   );
