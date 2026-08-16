@@ -4,6 +4,7 @@ import { useOrders } from "../hooks/useOrders";
 import { SubPageHeader } from "../components/ui/SubPageHeader";
 import { ROUTES } from "../config/navigation";
 import { COPY } from "../config/copy";
+import { formatINR } from "../config/constants";
 
 const statusStyles = {
   pending: "bg-amber-100 text-amber-700",
@@ -77,7 +78,7 @@ export default function Orders() {
                 })}
               </span>
               <span className="font-semibold text-leaf-700">
-                ₹{order.total}
+                {formatINR(order.total)}
               </span>
             </div>
 

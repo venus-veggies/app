@@ -5,6 +5,7 @@ import { useCart } from "../context/CartContext";
 import toast from "react-hot-toast";
 import { SubPageHeader } from "../components/ui/SubPageHeader";
 import { ROUTES } from "../config/navigation";
+import { formatINR } from "../config/constants";
 
 const statusStyles = {
   pending: "bg-amber-100 text-amber-700",
@@ -137,8 +138,10 @@ export default function OrderDetail() {
                 </div>
 
                 <div className="text-right">
-                  <p className="text-body">₹{item.total_price}</p>
-                  <p className="text-muted text-xs">₹{item.unit_price} each</p>
+                  <p className="text-body">{formatINR(item.total_price)}</p>
+                  <p className="text-muted text-xs">
+                    {formatINR(item.unit_price)} each
+                  </p>
                 </div>
               </div>
             ))}
@@ -150,21 +153,21 @@ export default function OrderDetail() {
             <h2 className="type-section mb-2">Summary</h2>
             <div className="flex justify-between text-sm text-body mb-1">
               <span>Subtotal</span>
-              <span>₹{order.subtotal}</span>
+              <span>{formatINR(order.subtotal)}</span>
             </div>
             <div className="flex justify-between text-sm text-body mb-1">
               <span>Delivery</span>
-              <span>₹{order.delivery_charge}</span>
+              <span>{formatINR(order.delivery_charge)}</span>
             </div>
             {order.discount > 0 && (
               <div className="flex justify-between text-sm text-tomato-600 mb-1">
                 <span>Discount</span>
-                <span>-₹{order.discount}</span>
+                <span>-{formatINR(order.discount)}</span>
               </div>
             )}
             <div className="border-t border-border pt-2 flex justify-between font-medium text-ink">
               <span>Total</span>
-              <span className="text-leaf-700">₹{order.total}</span>
+              <span className="text-leaf-700">{formatINR(order.total)}</span>
             </div>
           </div>
 
