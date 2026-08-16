@@ -53,9 +53,9 @@ export default function Orders() {
           <Link
             key={order.id}
             to={`${ROUTES.orders}/${order.id}`}
-            className="block bg-surface rounded-card shadow-card p-4 hover:shadow-card-hover transition-shadow"
+            className="block bg-surface rounded-card shadow-card p-4 hover:shadow-card-hover transition-shadow cursor-pointer"
           >
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between mb-1">
               <span className="font-medium text-ink">Order #{order.id}</span>
               <span
                 className={`text-xs font-medium px-2 py-0.5 rounded-pill ${
@@ -79,6 +79,19 @@ export default function Orders() {
                 ₹{order.total}
               </span>
             </div>
+
+            {order.thumbnails?.length > 0 && (
+              <div className="flex -space-x-2 mt-3">
+                {order.thumbnails.slice(0, 3).map((url, i) => (
+                  <img
+                    key={i}
+                    src={url}
+                    alt=""
+                    className="w-8 h-8 rounded-full border-2 border-surface object-cover"
+                  />
+                ))}
+              </div>
+            )}
           </Link>
         ))}
       </div>
