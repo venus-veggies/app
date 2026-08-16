@@ -89,97 +89,104 @@ export default function Cart() {
     <div className="pb-8">
       <h1 className="type-hero mb-4">{COPY.cartTitle}</h1>
 
-      <div className="flex flex-col gap-3 mb-5">
-        {lineItems.map(({ key, product, qty }) => (
-          <CartLineItem
-            key={key}
-            product={product}
-            qty={qty}
-            onRemove={removeItem}
-            onQtyChange={setQty}
-          />
-        ))}
-      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Items – left 2/3 */}
+        <div className="lg:col-span-2 flex flex-col gap-3">
+          {lineItems.map(({ key, product, qty }) => (
+            <CartLineItem
+              key={key}
+              product={product}
+              qty={qty}
+              onRemove={removeItem}
+              onQtyChange={setQty}
+            />
+          ))}
 
-      <OrderSummary subtotal={subtotal} />
-
-      <form
-        onSubmit={handleSubmit}
-        className="bg-surface rounded-card shadow-card p-4 mb-4 space-y-3"
-      >
-        <div className="flex items-center justify-between">
-          <h2 className="type-section">Delivery Address</h2>
-          {!showAddressForm && (
+          {lineItems.length > 0 && (
             <button
-              type="button"
-              onClick={() => setShowAddressForm(true)}
-              className="text-sm text-leaf-700 flex items-center gap-1"
+              onClick={() => clearCart()}
+              className="w-full text-center text-sm text-tomato-600 mt-1 underline underline-offset-2 transition-colors hover:text-tomato-500 active:scale-95"
             >
-              <Pencil size={14} /> Change
+              {COPY.cartClear}
             </button>
           )}
         </div>
 
-        {showAddressForm ? (
-          <>
-            <input
-              value={address.address_line1}
-              onChange={(e) =>
-                setAddress({ ...address, address_line1: e.target.value })
-              }
-              placeholder="House no, street, area"
-              className="w-full border border-border rounded-btn px-3 py-2.5 text-sm outline-none placeholder:text-muted"
-              required
-            />
-            <input
-              value={address.address_line2}
-              onChange={(e) =>
-                setAddress({ ...address, address_line2: e.target.value })
-              }
-              placeholder="Colony, sector (optional)"
-              className="w-full border border-border rounded-btn px-3 py-2.5 text-sm outline-none placeholder:text-muted"
-            />
-            <input
-              value={address.landmark}
-              onChange={(e) =>
-                setAddress({ ...address, landmark: e.target.value })
-              }
-              placeholder="Landmark (optional)"
-              className="w-full border border-border rounded-btn px-3 py-2.5 text-sm outline-none placeholder:text-muted"
-            />
-            <input
-              value={address.pincode}
-              onChange={(e) =>
-                setAddress({ ...address, pincode: e.target.value })
-              }
-              placeholder="Pincode"
-              type="tel"
-              className="w-full border border-border rounded-btn px-3 py-2.5 text-sm outline-none placeholder:text-muted"
-              required
-            />
-          </>
-        ) : (
-          <div className="text-sm text-body bg-leaf-100/60 rounded-btn p-3">
-            <p>{address.address_line1}</p>
-            {address.address_line2 && <p>{address.address_line2}</p>}
-            {address.landmark && <p>{address.landmark}</p>}
-            <p className="font-medium">{address.pincode}</p>
-          </div>
-        )}
+        {/* Summary + address + checkout – right 1/3 */}
+        <div className="space-y-4">
+          <OrderSummary subtotal={subtotal} />
 
-        <Button type="submit" className="w-full py-3" disabled={placing}>
-          {placing ? "Placing order…" : COPY.cartCheckout}
-        </Button>
-      </form>
+          <form
+            onSubmit={handleSubmit}
+            className="bg-surface rounded-card shadow-card p-4 space-y-3"
+          >
+            <div className="flex items-center justify-between">
+              <h2 className="type-section">Delivery Address</h2>
+              {!showAddressForm && (
+                <button
+                  type="button"
+                  onClick={() => setShowAddressForm(true)}
+                  className="text-sm text-leaf-700 flex items-center gap-1"
+                >
+                  <Pencil size={14} />
+                  Change
+                </button>
+              )}
+            </div>
 
-      {lineItems.length > 0 && (
-        <button
-          onClick={() => clearCart()}
-          className="w-full text-center text-sm text-tomato-600 mt-2 underline underline-offset-2 transition-colors hover:text-tomato-500 active:scale-95"
-        >
-          {COPY.cartClear}
-        </button>
-      )}
+            {showAddressForm ? (
+              <>
+                <input
+                  value={address.address_line1}
+                  onChange={(e) =>
+                    setAddress({ ...address, address_line1: e.target.value })
+                  }
+                  placeholder="House no, street, area"
+                  className="w-full border border-border rounded-btn px-3 py-2.5 text-sm outline-none placeholder:text-muted"
+                  required
+                />
+                <input
+                  value={address.address_line2}
+                  onChange={(e) =>
+                    setAddress({ ...address, address_line2: e.target.value })
+                  }
+                  placeholder="Colony, sector (optional)"
+                  className="w-full border border-border rounded-btn px-3 py-2.5 text-sm outline-none placeholder:text-muted"
+                />
+                <input
+                  value={address.landmark}
+                  onChange={(e) =>
+                    setAddress({ ...address, landmark: e.target.value })
+                  }
+                  placeholder="Landmark (optional)"
+                  className="w-full border border-border rounded-btn px-3 py-2.5 text-sm outline-none placeholder:text-muted"
+                />
+                <input
+                  value={address.pincode}
+                  onChange={(e) =>
+                    setAddress({ ...address, pincode: e.target.value })
+                  }
+                  placeholder="Pincode"
+                  type="tel"
+                  className="w-full border border-border rounded-btn px-3 py-2.5 text-sm outline-none placeholder:text-muted"
+                  required
+                />
+              </>
+            ) : (
+              <div className="text-sm text-body bg-leaf-100/60 rounded-btn p-3">
+                <p>{address.address_line1}</p>
+                {address.address_line2 && <p>{address.address_line2}</p>}
+                {address.landmark && <p>{address.landmark}</p>}
+                <p className="font-medium">{address.pincode}</p>
+              </div>
+            )}
+
+            <Button type="submit" className="w-full py-3" disabled={placing}>
+              {placing ? "Placing order…" : COPY.cartCheckout}
+            </Button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }
