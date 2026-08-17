@@ -10,6 +10,9 @@ export function useOrder(id) {
     if (!id) return;
 
     let cancelled = false;
+    setLoading(true);
+    setOrder(null);
+    setError(null);
 
     getOrderById(id)
       .then((order) => {

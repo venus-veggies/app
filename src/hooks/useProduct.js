@@ -11,6 +11,8 @@ export function useProduct(slug) {
 
     let cancelled = false;
     setLoading(true);
+    setProduct(null);
+    setError(null);
 
     getProductBySlug(slug)
       .then((data) => {

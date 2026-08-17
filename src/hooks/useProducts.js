@@ -6,6 +6,7 @@ import { DEFAULT_PER_PAGE } from "../config/constants";
 export function useProducts({
   search = "",
   category = "",
+  subcategory = "",
   perPage = DEFAULT_PER_PAGE,
 } = {}) {
   const [products, setProducts] = useState([]);
@@ -23,11 +24,12 @@ export function useProducts({
     const params = {};
     if (debouncedSearch.trim()) params.search = debouncedSearch.trim();
     if (category) params.category = category;
+    if (subcategory) params.subcategory = subcategory;
     params.per_page = perPage;
     params.page = 1;
 
     setLoading(true);
-    getProducts(params)
+    getProducts(params, controller.signal)
       .then((result) => {
         setProducts(result.products);
         setMeta(result.meta);
@@ -41,7 +43,7 @@ export function useProducts({
       .finally(() => setLoading(false));
 
     return () => controller.abort();
-  }, [debouncedSearch, category, perPage]);
+  }, [debouncedSearch, category, subcategory, perPage]);
 
   return { products, meta, loading, error };
 }

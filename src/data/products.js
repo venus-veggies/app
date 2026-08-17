@@ -1,7 +1,7 @@
 import api from "../api/client";
 import { DEFAULT_PER_PAGE } from "../config/constants";
 
-export async function getProducts(filters = {}) {
+export async function getProducts(filters = {}, signal = undefined) {
   const params = {};
   if (filters.search) params.search = filters.search;
   if (filters.category) params.category = filters.category;
@@ -9,7 +9,7 @@ export async function getProducts(filters = {}) {
   params.page = filters.page || 1;
   params.per_page = filters.per_page || DEFAULT_PER_PAGE;
 
-  const { data } = await api.get("/products", { params });
+  const { data } = await api.get("/products", { params, signal });
   return {
     products: data.data,
     meta: {
@@ -20,7 +20,7 @@ export async function getProducts(filters = {}) {
   };
 }
 
-export async function getProductBySlug(slug) {
-  const { data } = await api.get(`/products/${slug}`);
+export async function getProductBySlug(slug, signal = undefined) {
+  const { data } = await api.get(`/products/${slug}`, { signal });
   return data.data;
 }
