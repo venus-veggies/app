@@ -4,6 +4,7 @@ import {
   useState,
   useEffect,
   useCallback,
+  useMemo,
 } from "react";
 import api from "../api/client";
 
@@ -60,15 +61,18 @@ export function AuthProvider({ children }) {
     setUser(data.user);
   }, []);
 
-  const value = {
-    user,
-    loading,
-    isAuthenticated: !!user,
-    login,
-    register,
-    updateProfile,
-    logout,
-  };
+  const value = useMemo(
+    () => ({
+      user,
+      loading,
+      isAuthenticated: !!user,
+      login,
+      register,
+      updateProfile,
+      logout,
+    }),
+    [user, loading, login, register, updateProfile, logout],
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

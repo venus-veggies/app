@@ -17,19 +17,44 @@ export function CartProvider({ children }) {
 
   const storageKey = user ? `cart_${user.id}` : GUEST_KEY;
 
-  // Load cart from storage when key changes
+  // Load cart from storage, merging guest cart into user cart if needed
   useEffect(() => {
+    let baseItems = {};
+
     try {
       const saved = localStorage.getItem(storageKey);
       if (saved) {
-        setItems(JSON.parse(saved));
-      } else {
-        setItems({});
+        baseItems = JSON.parse(saved);
       }
     } catch {
-      setItems({});
+      baseItems = {};
     }
-  }, [storageKey]);
+
+    if (user) {
+      const guestCart = localStorage.getItem(GUEST_KEY);
+      if (guestCart) {
+        try {
+          const guestItems = JSON.parse(guestCart);
+          const merged = { ...baseItems };
+
+          for (const [key, guestEntry] of Object.entries(guestItems)) {
+            if (merged[key]) {
+              merged[key].qty += guestEntry.qty;
+            } else {
+              merged[key] = guestEntry;
+            }
+          }
+
+          baseItems = merged;
+          localStorage.removeItem(GUEST_KEY);
+        } catch {
+          localStorage.removeItem(GUEST_KEY);
+        }
+      }
+    }
+
+    setItems(baseItems);
+  }, [storageKey, user]);
 
   // Save cart whenever items change
   useEffect(() => {
@@ -40,38 +65,9 @@ export function CartProvider({ children }) {
     }
   }, [items, storageKey]);
 
-  // Merge guest cart into user cart on login
-  useEffect(() => {
-    if (user) {
-      const guestCart = localStorage.getItem(GUEST_KEY);
-      if (guestCart) {
-        try {
-          const guestItems = JSON.parse(guestCart);
-          if (Object.keys(guestItems).length > 0) {
-            setItems((prev) => {
-              const merged = { ...prev };
-              for (const [key, guestEntry] of Object.entries(guestItems)) {
-                if (merged[key]) {
-                  merged[key].qty += guestEntry.qty;
-                } else {
-                  merged[key] = guestEntry;
-                }
-              }
-              return merged;
-            });
-          }
-          localStorage.removeItem(GUEST_KEY);
-        } catch {
-          localStorage.removeItem(GUEST_KEY);
-        }
-      }
-    }
-  }, [user]);
-
   // Add item – variant-aware
   const addItem = useCallback((product, qty = 1, selectedVariant = null) => {
     setItems((prev) => {
-      // Use a unique key: product slug + variant id if variant exists
       const variant = selectedVariant || product.variant || null;
       const key = variant?.id ? `${product.slug}_${variant.id}` : product.slug;
 
@@ -85,9 +81,7 @@ export function CartProvider({ children }) {
             slug: product.slug,
             name: product.name,
             image_url: product.image_url,
-            // Use variant price if available; otherwise product.price
             price: variant?.current_price ?? product.price ?? 0,
-            // Keep enough variant info for API order submission
             variant: variant
               ? {
                   id: variant.id,
@@ -146,15 +140,18 @@ export function CartProvider({ children }) {
     [lineItems],
   );
 
-  const value = {
-    lineItems,
-    totalCount,
-    subtotal,
-    addItem,
-    setQty,
-    removeItem,
-    clearCart,
-  };
+  const value = useMemo(
+    () => ({
+      lineItems,
+      totalCount,
+      subtotal,
+      addItem,
+      setQty,
+      removeItem,
+      clearCart,
+    }),
+    [lineItems, totalCount, subtotal, addItem, setQty, removeItem, clearCart],
+  );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
