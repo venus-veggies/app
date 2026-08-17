@@ -1,9 +1,12 @@
+import { useState } from "react";
 import { X } from "lucide-react";
 import { QuantityStepper } from "../ui/QuantityStepper";
+import { formatINR } from "../../config/constants";
 
 export function CartLineItem({ product, qty, onRemove, onQtyChange }) {
   const unit = product.variant?.display_label ?? product.variant?.label ?? "";
   const imageSrc = product.image_url;
+  const [imgError, setImgError] = useState(false);
 
   // Variant-aware key – same as CartContext
   const itemKey = product.variant?.id
@@ -12,19 +15,12 @@ export function CartLineItem({ product, qty, onRemove, onQtyChange }) {
 
   return (
     <div className="flex gap-3 bg-surface rounded-card p-3 shadow-card">
-      {imageSrc ? (
+      {imageSrc && !imgError ? (
         <img
           src={imageSrc}
           alt={product.name}
           className="w-16 h-16 rounded-btn object-cover shrink-0"
-          onError={(e) => {
-            e.currentTarget.style.display = "none";
-            const placeholder = document.createElement("div");
-            placeholder.className =
-              "w-16 h-16 rounded-btn flex items-center justify-center bg-leaf-100/60 shrink-0";
-            placeholder.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-leaf-400"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>`;
-            e.currentTarget.parentNode.appendChild(placeholder);
-          }}
+          onError={() => setImgError(true)}
         />
       ) : (
         <div className="w-16 h-16 rounded-btn flex items-center justify-center bg-leaf-100/60 shrink-0">
@@ -61,9 +57,7 @@ export function CartLineItem({ product, qty, onRemove, onQtyChange }) {
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="type-price">
-            ₹{(product.price * qty).toFixed(0)}
-          </span>
+          <span className="type-price">{formatINR(product.price * qty)}</span>
           <QuantityStepper
             value={qty}
             onChange={(val) => onQtyChange(itemKey, val)}

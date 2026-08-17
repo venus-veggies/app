@@ -4,6 +4,7 @@ import { Plus } from "lucide-react";
 import { useCart } from "../../context/CartContext";
 import { useAddToCart } from "../../hooks/useAddToCart";
 import { productPath } from "../../config/navigation";
+import { formatINR } from "../../config/constants";
 
 export default function ProductCard({ product, className = "" }) {
   const { lineItems } = useCart();
@@ -102,7 +103,9 @@ export default function ProductCard({ product, className = "" }) {
           {isAvailable ? unit || "Per piece" : "Not available"}
         </p>
         <div className="flex items-baseline gap-1.5">
-          <span className="type-price">{isAvailable ? `₹${price}` : "—"}</span>
+          <span className="type-price">
+            {isAvailable ? formatINR(price) : "—"}
+          </span>
         </div>
       </div>
     </Link>
