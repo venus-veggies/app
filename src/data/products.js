@@ -5,6 +5,7 @@ export async function getProducts(filters = {}) {
   const params = {};
   if (filters.search) params.search = filters.search;
   if (filters.category) params.category = filters.category;
+  if (filters.subcategory) params.subcategory = filters.subcategory;
   params.page = filters.page || 1;
   params.per_page = filters.per_page || DEFAULT_PER_PAGE;
 

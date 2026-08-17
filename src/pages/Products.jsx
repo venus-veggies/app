@@ -13,13 +13,16 @@ export default function Products() {
   const initialSearch = searchParams.get("search") || "";
   const [query, setQuery] = useState(initialSearch);
 
-  const [selectedCategory, setSelectedCategory] = useState("");
   const [categories, setCategories] = useState([]);
   const [catError, setCatError] = useState(null);
 
+  const [selectedParent, setSelectedParent] = useState("");
+  const [selectedSub, setSelectedSub] = useState("");
+
   const { products, loading, error } = useProducts({
     search: query,
-    category: selectedCategory,
+    category: selectedParent,
+    subcategory: selectedSub,
   });
 
   useDocumentTitle("Shop");
@@ -34,14 +37,29 @@ export default function Products() {
     setQuery(searchParams.get("search") || "");
   }, [searchParams]);
 
+  // Derive parent and child categories
+  const parentCategories = categories.filter((c) => !c.parent_id);
+  const selectedParentId = parentCategories.find(
+    (c) => c.slug === selectedParent,
+  )?.id;
+  const subCategories = categories.filter(
+    (c) => c.parent_id === selectedParentId,
+  );
+
   const availableProducts = products.filter((product) =>
     product.variants?.some((v) => v.status === "active"),
   );
+
+  const handleParentClick = (slug) => {
+    setSelectedParent(slug === selectedParent ? "" : slug);
+    setSelectedSub(""); // reset sub when parent changes
+  };
 
   return (
     <div>
       <Hero />
 
+      {/* Mobile search */}
       <div className="md:hidden flex items-center gap-2 bg-surface rounded-pill px-3.5 py-2.5 border border-border mb-4">
         <Search size={17} className="text-muted" />
         <input
@@ -53,23 +71,24 @@ export default function Products() {
         <SlidersHorizontal size={16} className="text-muted shrink-0" />
       </div>
 
-      <div className="flex gap-2 overflow-x-auto no-scrollbar mb-5 -mx-4 px-4 md:mx-0 md:px-0">
+      {/* Parent categories */}
+      <div className="flex gap-2 overflow-x-auto no-scrollbar mb-3">
         <button
-          onClick={() => setSelectedCategory("")}
+          onClick={() => handleParentClick("")}
           className={`shrink-0 text-sm font-medium px-4 py-1.5 rounded-pill border ${
-            selectedCategory === ""
+            selectedParent === ""
               ? "bg-leaf-500 border-leaf-500 text-white"
               : "bg-surface border-border text-body hover:border-leaf-400"
           }`}
         >
           {COPY.categoryAll}
         </button>
-        {categories.map((c) => (
+        {parentCategories.map((c) => (
           <button
             key={c.slug}
-            onClick={() => setSelectedCategory(c.slug)}
+            onClick={() => handleParentClick(c.slug)}
             className={`shrink-0 text-sm font-medium px-4 py-1.5 rounded-pill border transition-colors ${
-              selectedCategory === c.slug
+              selectedParent === c.slug
                 ? "bg-leaf-500 border-leaf-500 text-white"
                 : "bg-surface border-border text-body hover:border-leaf-400"
             }`}
@@ -79,6 +98,38 @@ export default function Products() {
         ))}
       </div>
 
+      {/* Subcategories (only when parent selected and has children) */}
+      {selectedParent && subCategories.length > 0 && (
+        <div className="flex gap-2 overflow-x-auto no-scrollbar mb-4">
+          <button
+            onClick={() => setSelectedSub("")}
+            className={`shrink-0 text-xs font-medium px-3 py-1 rounded-pill border ${
+              selectedSub === ""
+                ? "bg-leaf-100 border-leaf-500 text-leaf-700"
+                : "bg-surface border-border text-body hover:border-leaf-400"
+            }`}
+          >
+            All
+          </button>
+          {subCategories.map((c) => (
+            <button
+              key={c.slug}
+              onClick={() => setSelectedSub(c.slug)}
+              className={`shrink-0 text-xs font-medium px-3 py-1 rounded-pill border transition-colors ${
+                selectedSub === c.slug
+                  ? "bg-leaf-100 border-leaf-500 text-leaf-700"
+                  : "bg-surface border-border text-body hover:border-leaf-400"
+              }`}
+            >
+              {c.name}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {catError && <p className="text-sm text-red-500 mb-3">{catError}</p>}
+
+      {/* Product grid states */}
       {loading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
