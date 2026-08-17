@@ -1,4 +1,6 @@
-import { Link, NavLink } from "react-router-dom";
+import { useState } from "react";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+
 import { NAV_ICONS, NAV_LINKS, ROUTES } from "../../config/navigation";
 import { BRAND } from "../../content/brand";
 import { useCart } from "../../context/CartContext";
@@ -13,9 +15,9 @@ export default function TopNav() {
   const { totalCount } = useCart();
   const LogoIcon = NAV_ICONS.logo;
   const LocationIcon = NAV_ICONS.location;
+  const navigate = useNavigate();
+  const [search, setSearch] = useState("");
 
-  // We only show non-cart/non-profile nav items as text links on desktop.
-  // Cart and Profile are represented by icon buttons on the right.
   const desktopTextLinks = NAV_LINKS.filter(
     (link) => link.key !== "cart" && link.key !== "profile",
   );
@@ -34,10 +36,14 @@ export default function TopNav() {
         </Link>
 
         {/* Delivery pill – mobile only */}
-        <div className="md:hidden flex items-center gap-1 text-xs text-body bg-leaf-100 rounded-pill px-3 py-1.5">
-          <LocationIcon size={13} className="text-leaf-700" />
-          <span>{BRAND.deliveryPromise}</span>
-        </div>
+        <button
+          type="button"
+          onClick={() => console.log("Open address selector")} // placeholder for future address change
+          className="md:hidden flex items-center gap-1.5 text-xs text-leaf-900 bg-leaf-100 rounded-pill px-3 py-1.5 shrink-0 max-w-[200px]"
+        >
+          <LocationIcon size={14} className="text-leaf-700 shrink-0" />
+          <span className="truncate">Sainik Colony</span>
+        </button>
 
         {/* Desktop text links – now only Shop or future non-icon tabs */}
         <nav className="hidden md:flex items-center gap-6 ml-2">
@@ -53,6 +59,14 @@ export default function TopNav() {
           <NAV_ICONS.search size={16} className="text-muted" />
           <input
             placeholder={COPY.searchPlaceholder}
+            value={search}
+            onChange={(e) => {
+              const value = e.target.value;
+              setSearch(value);
+              navigate(
+                value ? `/shop?search=${encodeURIComponent(value)}` : "/shop",
+              );
+            }}
             className="bg-transparent text-sm outline-none placeholder:text-muted w-full"
           />
         </div>
