@@ -11,6 +11,7 @@ import { useAddToCart } from "../hooks/useAddToCart";
 import useDocumentTitle from "../hooks/useDocumentTitle";
 import { ROUTES } from "../config/navigation";
 import { COPY } from "../config/copy";
+import { formatINR } from "../config/constants";
 
 const FACTS = [
   { icon: LeafIcon, label: COPY.farmFresh },
@@ -131,7 +132,7 @@ export default function ProductDetail() {
         <p className="type-caption mb-3">{unit}</p>
 
         <div className="flex items-center gap-3 mb-4">
-          <span className="type-price-lg">₹{price}</span>
+          <span className="type-price-lg">{formatINR(price)}</span>
         </div>
 
         {activeVariants.length > 1 && (
@@ -178,7 +179,7 @@ export default function ProductDetail() {
         <div className="max-w-6xl mx-auto">
           {activeVariants.length > 0 ? (
             <Button className="w-full py-3" onClick={handleAdd}>
-              Add {qty > 1 ? `${qty} ` : ""}to cart · ₹{price * qty}
+              Add {qty > 1 ? `${qty} ` : ""}to cart · {formatINR(price * qty)}
             </Button>
           ) : (
             <div className="text-center text-sm text-tomato-600 bg-tomato-100 rounded-btn py-3">

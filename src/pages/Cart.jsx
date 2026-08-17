@@ -121,7 +121,7 @@ export default function Cart() {
             className="bg-surface rounded-card shadow-card p-4 space-y-3"
           >
             <div className="flex items-center justify-between">
-              <h2 className="type-section">Delivery Address</h2>
+              <h2 className="type-section">{COPY.addressTitle}</h2>
               {!showAddressForm && (
                 <button
                   type="button"
@@ -141,7 +141,7 @@ export default function Cart() {
                   onChange={(e) =>
                     setAddress({ ...address, address_line1: e.target.value })
                   }
-                  placeholder="House no, street, area"
+                  placeholder={COPY.addressLine1Placeholder}
                   className="w-full border border-border rounded-btn px-3 py-2.5 text-sm outline-none placeholder:text-muted"
                   required
                 />
@@ -150,7 +150,7 @@ export default function Cart() {
                   onChange={(e) =>
                     setAddress({ ...address, address_line2: e.target.value })
                   }
-                  placeholder="Colony, sector (optional)"
+                  placeholder={COPY.addressLine2Placeholder}
                   className="w-full border border-border rounded-btn px-3 py-2.5 text-sm outline-none placeholder:text-muted"
                 />
                 <input
@@ -158,7 +158,7 @@ export default function Cart() {
                   onChange={(e) =>
                     setAddress({ ...address, landmark: e.target.value })
                   }
-                  placeholder="Landmark (optional)"
+                  placeholder={COPY.landmarkPlaceholder}
                   className="w-full border border-border rounded-btn px-3 py-2.5 text-sm outline-none placeholder:text-muted"
                 />
                 <input
@@ -166,7 +166,7 @@ export default function Cart() {
                   onChange={(e) =>
                     setAddress({ ...address, pincode: e.target.value })
                   }
-                  placeholder="Pincode"
+                  placeholder={COPY.pincodePlaceholder}
                   type="tel"
                   className="w-full border border-border rounded-btn px-3 py-2.5 text-sm outline-none placeholder:text-muted"
                   required

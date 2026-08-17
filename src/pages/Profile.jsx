@@ -27,7 +27,10 @@ export default function Profile() {
   const { user, logout, updateProfile } = useAuth();
   const navigate = useNavigate();
 
-  const [editing, setEditing] = useState(false);
+  // Separate editing states for header and address card
+  const [profileEditing, setProfileEditing] = useState(false);
+  const [addressEditing, setAddressEditing] = useState(false);
+
   const [address, setAddress] = useState({
     name: user?.name || "",
     address_line1: user?.address_line1 || "",
@@ -63,7 +66,7 @@ export default function Profile() {
     try {
       await updateProfile(address);
       toast.success("Address updated.");
-      setEditing(false);
+      setAddressEditing(false);
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to update address");
     } finally {
@@ -73,14 +76,15 @@ export default function Profile() {
 
   return (
     <div className="pb-6">
+      {/* Profile header – clicking toggles profile editing */}
       <div
-        onClick={() => setEditing((e) => !e)}
+        onClick={() => setProfileEditing((e) => !e)}
         role="button"
         tabIndex={0}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
-            setEditing((e) => !e);
+            setProfileEditing((e) => !e);
           }
         }}
         className="flex items-center gap-4 mb-6 cursor-pointer select-none"
@@ -97,7 +101,7 @@ export default function Profile() {
         <button
           onClick={(e) => {
             e.stopPropagation();
-            setEditing((e) => !e);
+            setProfileEditing((e) => !e);
           }}
           aria-label={COPY.editProfileAria}
           className="ml-auto w-9 h-9 rounded-full bg-leaf-100 flex items-center justify-center shrink-0 transition-transform active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf-300"
@@ -105,13 +109,14 @@ export default function Profile() {
           <Pencil size={15} className="text-leaf-700" />
         </button>
       </div>
+
       {/* Address card */}
       <div className="bg-surface rounded-card shadow-card p-4 mb-6">
         <div className="flex items-center justify-between mb-3">
           <h2 className="type-section">{COPY.addressTitle}</h2>
-          {!editing && (
+          {!addressEditing && (
             <button
-              onClick={() => setEditing(true)}
+              onClick={() => setAddressEditing(true)}
               className="text-sm text-leaf-700 flex items-center gap-1"
             >
               <Pencil size={13} />
@@ -120,7 +125,7 @@ export default function Profile() {
           )}
         </div>
 
-        {editing ? (
+        {addressEditing ? (
           <div className="space-y-3">
             <input
               value={address.name}
@@ -165,7 +170,7 @@ export default function Profile() {
             <div className="flex gap-2 pt-1">
               <button
                 type="button"
-                onClick={() => setEditing(false)}
+                onClick={() => setAddressEditing(false)}
                 className="flex-1 py-2.5 rounded-btn border border-border text-body text-sm"
               >
                 Cancel
@@ -201,7 +206,7 @@ export default function Profile() {
                 if (key === "orders") {
                   navigate(ROUTES.orders);
                 } else if (key === "addresses") {
-                  setEditing(true);
+                  setAddressEditing(true);
                 } else {
                   toast(COPY.menuNotWired.replace("{{label}}", label));
                 }
