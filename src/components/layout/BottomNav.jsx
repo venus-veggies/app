@@ -7,7 +7,7 @@ export default function BottomNav() {
 
   return (
     <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-surface border-t border-border safe-bottom">
-      <div className="flex items-stretch justify-around px-2 py-1.5">
+      <div className="flex items-stretch justify-around px-1 py-1.5">
         {NAV_LINKS.map(({ key, label, icon, path, end, badge }) => {
           const Icon = NAV_ICONS[icon];
           return (
@@ -16,7 +16,7 @@ export default function BottomNav() {
               to={path}
               end={end}
               className={({ isActive }) =>
-                `relative flex flex-col items-center gap-0.5 py-1.5 px-4 rounded-pill min-w-[4.5rem] transition-colors ${
+                `relative flex flex-1 flex-col items-center gap-0.5 py-1.5 px-1 rounded-pill transition-colors ${
                   isActive ? "bg-leaf-100 text-leaf-700" : "text-muted"
                 }`
               }

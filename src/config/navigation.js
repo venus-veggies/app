@@ -5,6 +5,7 @@ import {
   Leaf,
   MapPin,
   Search,
+  Package,
 } from "lucide-react";
 
 // All icons used in navigation are defined here.
@@ -12,6 +13,7 @@ import {
 export const NAV_ICONS = {
   shop: Sprout,
   cart: ShoppingBasket,
+  orders: Package,
   profile: UserRound,
   logo: Leaf,
   location: MapPin,
@@ -38,6 +40,7 @@ export function productPath(slug) {
 // Uses ROUTES so a path change in ROUTES affects both navs instantly.
 export const NAV_LINKS = [
   { key: "shop", label: "Shop", icon: "shop", path: ROUTES.shop, end: true },
+  { key: "orders", label: "Orders", icon: "orders", path: ROUTES.orders },
   { key: "cart", label: "Cart", icon: "cart", path: ROUTES.cart, badge: true },
   { key: "profile", label: "Profile", icon: "profile", path: ROUTES.profile },
 ];

@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { Sprout } from "lucide-react";
 import { useOrders } from "../hooks/useOrders";
-import { SubPageHeader } from "../components/ui/SubPageHeader";
 import { ROUTES } from "../config/navigation";
 import { COPY } from "../config/copy";
 import { formatINR } from "../config/constants";
@@ -48,7 +47,7 @@ export default function Orders() {
 
   return (
     <div className="pb-10">
-      <SubPageHeader title="My Orders" backTo={ROUTES.profile} />
+      <h1 className="type-hero mb-4">My Orders</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
         {orders.map((order) => (
