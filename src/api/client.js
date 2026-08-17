@@ -17,11 +17,17 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // Ignore aborted requests – these are expected during search/filter
+    if (error.code === "ERR_CANCELED" || error.name === "AbortError") {
+      return Promise.reject(error);
+    }
+
     // Don't toast on 401 (let the auth flow handle it)
     if (error.response?.status !== 401) {
       const msg = error.response?.data?.message || "Something went wrong";
       toast.error(msg);
     }
+
     return Promise.reject(error);
   },
 );
