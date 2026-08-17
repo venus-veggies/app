@@ -73,7 +73,18 @@ export default function Profile() {
 
   return (
     <div className="pb-6">
-      <div className="flex items-center gap-4 mb-6">
+      <div
+        onClick={() => setEditing((e) => !e)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setEditing((e) => !e);
+          }
+        }}
+        className="flex items-center gap-4 mb-6 cursor-pointer select-none"
+      >
         <div className="relative w-16 h-16 rounded-full bg-leaf-500 text-white flex items-center justify-center font-display text-xl font-semibold shrink-0">
           {initials}
         </div>
@@ -84,14 +95,16 @@ export default function Profile() {
           </p>
         </div>
         <button
-          onClick={() => setEditing((e) => !e)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setEditing((e) => !e);
+          }}
           aria-label={COPY.editProfileAria}
           className="ml-auto w-9 h-9 rounded-full bg-leaf-100 flex items-center justify-center shrink-0 transition-transform active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf-300"
         >
           <Pencil size={15} className="text-leaf-700" />
         </button>
       </div>
-
       {/* Address card */}
       <div className="bg-surface rounded-card shadow-card p-4 mb-6">
         <div className="flex items-center justify-between mb-3">

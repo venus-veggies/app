@@ -78,7 +78,7 @@ export const COPY = {
   heroStartShopping: "Start shopping",
   heroSeeTodaysRate: "See today's rate",
 
-  addressTitle: "Delivery Address",
+  addressTitle: "Default Address",
   addressLine1Placeholder: "House no, street, area",
   addressLine2Placeholder: "Colony, sector (optional)",
   landmarkPlaceholder: "Landmark (optional)",
