@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ShoppingBasket, Pencil } from "lucide-react";
 import toast from "react-hot-toast";
@@ -9,14 +9,22 @@ import { OrderSummary } from "../components/cart/OrderSummary";
 import { Button } from "../components/ui/Button";
 import { EmptyState } from "../components/ui/EmptyState";
 import { placeOrder } from "../data/orders";
+import { validatePrices } from "../data/products";
 import { ROUTES } from "../config/navigation";
 import { COPY } from "../config/copy";
 
 export default function Cart() {
-  const { lineItems, subtotal, setQty, removeItem, clearCart } = useCart();
+  const {
+    lineItems,
+    subtotal,
+    setQty,
+    removeItem,
+    clearCart,
+    updateItemPrice,
+  } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
-
+  const lastValidatedIdsRef = useRef("");
   const [address, setAddress] = useState({
     address_line1: user?.address_line1 || "",
     address_line2: user?.address_line2 || "",
@@ -28,6 +36,53 @@ export default function Cart() {
     !user?.address_line1 || !user?.pincode,
   );
   const [placing, setPlacing] = useState(false);
+
+  // Revalidate cart prices against the server whenever the cart changes
+  useEffect(() => {
+    const variantIds = lineItems
+      .map((item) => item.product.variant?.id)
+      .filter(Boolean);
+
+    const idsKey = variantIds.join(",");
+    if (!idsKey || idsKey === lastValidatedIdsRef.current) return;
+
+    lastValidatedIdsRef.current = idsKey;
+
+    let cancelled = false;
+
+    validatePrices(variantIds)
+      .then((variants) => {
+        if (cancelled) return;
+
+        const priceMap = {};
+        variants.forEach((v) => {
+          priceMap[v.id] = v.current_price;
+        });
+
+        let changed = false;
+        lineItems.forEach((item) => {
+          const variantId = item.product.variant?.id;
+          if (variantId && priceMap[variantId] !== undefined) {
+            const newPrice = parseFloat(priceMap[variantId]);
+            if (item.product.price !== newPrice) {
+              updateItemPrice(item.key, newPrice);
+              changed = true;
+            }
+          }
+        });
+
+        if (changed) {
+          toast.success("Prices updated to today's rates.");
+        }
+      })
+      .catch(() => {
+        // Ignore – next visit will retry
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [lineItems, updateItemPrice]);
 
   if (lineItems.length === 0) {
     return (

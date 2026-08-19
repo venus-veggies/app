@@ -86,6 +86,23 @@ export function CartProvider({ children }) {
     setItems({});
   }, []);
 
+  const updateItemPrice = useCallback((itemKey, newPrice) => {
+    setItems((prev) => {
+      if (!prev[itemKey]) return prev;
+
+      return {
+        ...prev,
+        [itemKey]: {
+          ...prev[itemKey],
+          product: {
+            ...prev[itemKey].product,
+            price: newPrice,
+          },
+        },
+      };
+    });
+  }, []);
+
   const lineItems = useMemo(
     () =>
       Object.entries(items).map(([key, entry]) => ({
@@ -114,8 +131,18 @@ export function CartProvider({ children }) {
       setQty,
       removeItem,
       clearCart,
+      updateItemPrice,
     }),
-    [lineItems, totalCount, subtotal, addItem, setQty, removeItem, clearCart],
+    [
+      lineItems,
+      totalCount,
+      subtotal,
+      addItem,
+      setQty,
+      removeItem,
+      clearCart,
+      updateItemPrice,
+    ],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

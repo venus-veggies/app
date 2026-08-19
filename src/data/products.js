@@ -29,3 +29,10 @@ export async function getProductBySlug(slug, signal = undefined) {
   const { data } = await api.get(`/products/${slug}`, { signal });
   return data.data;
 }
+
+export async function validatePrices(variantIds) {
+  const { data } = await api.post("/products/validate-prices", {
+    variant_ids: variantIds,
+  });
+  return data.data ?? [];
+}
