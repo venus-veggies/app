@@ -7,65 +7,30 @@ import {
   useCallback,
 } from "react";
 import { useAuth } from "./AuthContext";
+import {
+  getCartKey,
+  loadAndMergeGuestCart,
+  saveCart,
+} from "../utils/cartStorage";
 
 const CartContext = createContext(null);
-const GUEST_KEY = "cart_guest";
 
 export function CartProvider({ children }) {
   const { user } = useAuth();
   const [items, setItems] = useState({});
 
-  const storageKey = user ? `cart_${user.id}` : GUEST_KEY;
+  const storageKey = getCartKey(user);
 
-  // Load cart from storage, merging guest cart into user cart if needed
+  // Load cart and merge guest cart when storageKey or user changes
   useEffect(() => {
-    let baseItems = {};
-
-    try {
-      const saved = localStorage.getItem(storageKey);
-      if (saved) {
-        baseItems = JSON.parse(saved);
-      }
-    } catch {
-      baseItems = {};
-    }
-
-    if (user) {
-      const guestCart = localStorage.getItem(GUEST_KEY);
-      if (guestCart) {
-        try {
-          const guestItems = JSON.parse(guestCart);
-          const merged = { ...baseItems };
-
-          for (const [key, guestEntry] of Object.entries(guestItems)) {
-            if (merged[key]) {
-              merged[key].qty += guestEntry.qty;
-            } else {
-              merged[key] = guestEntry;
-            }
-          }
-
-          baseItems = merged;
-          localStorage.removeItem(GUEST_KEY);
-        } catch {
-          localStorage.removeItem(GUEST_KEY);
-        }
-      }
-    }
-
-    setItems(baseItems);
+    setItems(loadAndMergeGuestCart(storageKey, user));
   }, [storageKey, user]);
 
   // Save cart whenever items change
   useEffect(() => {
-    if (Object.keys(items).length === 0) {
-      localStorage.removeItem(storageKey);
-    } else {
-      localStorage.setItem(storageKey, JSON.stringify(items));
-    }
+    saveCart(storageKey, items);
   }, [items, storageKey]);
 
-  // Add item – variant-aware
   const addItem = useCallback((product, qty = 1, selectedVariant = null) => {
     setItems((prev) => {
       const variant = selectedVariant || product.variant || null;
