@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ShoppingBasket, Pencil } from "lucide-react";
 import toast from "react-hot-toast";
 import { useCart } from "../context/CartContext";
@@ -7,6 +7,7 @@ import { useAuth } from "../context/AuthContext";
 import { CartLineItem } from "../components/cart/CartLineItem";
 import { OrderSummary } from "../components/cart/OrderSummary";
 import { Button } from "../components/ui/Button";
+import { EmptyState } from "../components/ui/EmptyState";
 import { placeOrder } from "../data/orders";
 import { ROUTES } from "../config/navigation";
 import { COPY } from "../config/copy";
