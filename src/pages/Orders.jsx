@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Sprout } from "lucide-react";
 import { useOrders } from "../hooks/useOrders";
-import { ROUTES } from "../config/navigation";
+import { orderPath, ROUTES } from "../config/navigation";
 import { COPY } from "../config/copy";
 import { formatINR } from "../config/constants";
 
@@ -36,12 +36,13 @@ export default function Orders() {
 
   if (orders.length === 0) {
     return (
-      <div className="text-center py-20 text-muted">
-        <p className="mb-3">No orders yet.</p>
-        <Link to={ROUTES.shop} className="text-leaf-700 underline">
-          {COPY.cartStartShopping}
-        </Link>
-      </div>
+      <EmptyState
+        icon={<Sprout size={32} />}
+        title="No orders yet"
+        message={COPY.cartEmptyHint}
+        actionLabel={COPY.cartStartShopping}
+        actionTo={ROUTES.shop}
+      />
     );
   }
 
@@ -53,7 +54,7 @@ export default function Orders() {
         {orders.map((order) => (
           <Link
             key={order.id}
-            to={`${ROUTES.orders}/${order.id}`}
+            to={orderPath(order.id)}
             className="block bg-surface rounded-card shadow-card p-4 hover:shadow-card-hover transition-shadow cursor-pointer"
           >
             <div className="flex items-center justify-between mb-1">

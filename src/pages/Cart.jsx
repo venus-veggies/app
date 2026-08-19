@@ -30,16 +30,13 @@ export default function Cart() {
 
   if (lineItems.length === 0) {
     return (
-      <div className="flex flex-col items-center text-center py-20">
-        <div className="w-16 h-16 rounded-full bg-leaf-100 flex items-center justify-center mb-4">
-          <ShoppingBasket size={28} className="text-leaf-600" />
-        </div>
-        <h1 className="type-section mb-1">{COPY.cartEmptyTitle}</h1>
-        <p className="text-sm text-muted mb-5">{COPY.cartEmptyHint}</p>
-        <Link to={ROUTES.shop}>
-          <Button>{COPY.cartStartShopping}</Button>
-        </Link>
-      </div>
+      <EmptyState
+        icon={<ShoppingBasket size={28} className="text-leaf-600" />}
+        title={COPY.cartEmptyTitle}
+        message={COPY.cartEmptyHint}
+        actionLabel={COPY.cartStartShopping}
+        actionTo={ROUTES.shop}
+      />
     );
   }
 

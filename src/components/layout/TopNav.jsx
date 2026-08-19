@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 
 import { NAV_ICONS, NAV_LINKS, ROUTES } from "../../config/navigation";
-import { BRAND } from "../../content/brand";
 import { useCart } from "../../context/CartContext";
 import { COPY } from "../../config/copy";
 
@@ -38,14 +37,14 @@ export default function TopNav() {
         {/* Delivery pill – mobile only */}
         <button
           type="button"
-          onClick={() => console.log("Open address selector")} // placeholder for future address change
+          onClick={() => {}} // TODO: wire address selector
           className="md:hidden flex items-center gap-1.5 text-xs text-leaf-900 bg-leaf-100 rounded-pill px-3 py-1.5 shrink-0 max-w-[200px]"
         >
           <LocationIcon size={14} className="text-leaf-700 shrink-0" />
           <span className="truncate">Sainik Colony</span>
         </button>
 
-        {/* Desktop text links – now only Shop or future non-icon tabs */}
+        {/* Desktop text links */}
         <nav className="hidden md:flex items-center gap-6 ml-2">
           {desktopTextLinks.map(({ key, label, path, end }) => (
             <NavLink key={key} to={path} end={end} className={navLinkClass}>
@@ -65,13 +64,14 @@ export default function TopNav() {
               setSearch(value);
               navigate(
                 value ? `/shop?search=${encodeURIComponent(value)}` : "/shop",
+                { replace: true },
               );
             }}
             className="bg-transparent text-sm outline-none placeholder:text-muted w-full"
           />
         </div>
 
-        {/* Cart + profile icons – DESKTOP ONLY */}
+        {/* Cart + profile icons – desktop only */}
         <div className="hidden md:flex items-center gap-1 ml-auto md:ml-4">
           <Link
             to={ROUTES.cart}

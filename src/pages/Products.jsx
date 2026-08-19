@@ -6,6 +6,7 @@ import { useProducts } from "../hooks/useProducts";
 import ProductCard from "../components/product/ProductCard";
 import Hero from "../components/hero/Hero";
 import useDocumentTitle from "../hooks/useDocumentTitle";
+import { LoadingSkeleton } from "../components/ui/LoadingSkeleton";
 import { COPY, tpl } from "../config/copy";
 
 export default function Products() {
@@ -131,21 +132,7 @@ export default function Products() {
 
       {/* Product grid states */}
       {loading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div
-              key={i}
-              className="bg-surface rounded-card shadow-card animate-pulse"
-            >
-              <div className="aspect-square bg-leaf-100/60 rounded-t-card" />
-              <div className="p-3 space-y-2">
-                <div className="h-4 bg-leaf-100 rounded w-3/4" />
-                <div className="h-3 bg-leaf-100 rounded w-1/2" />
-                <div className="h-4 bg-leaf-100 rounded w-1/3" />
-              </div>
-            </div>
-          ))}
-        </div>
+        <LoadingSkeleton variant="product-card" />
       ) : error ? (
         <div className="text-center py-16 text-muted">
           <p className="font-medium text-body">{error}</p>

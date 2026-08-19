@@ -8,8 +8,6 @@ import {
   Package,
 } from "lucide-react";
 
-// All icons used in navigation are defined here.
-// If you want to change an icon, change it once in this object.
 export const NAV_ICONS = {
   shop: Sprout,
   cart: ShoppingBasket,
@@ -20,7 +18,6 @@ export const NAV_ICONS = {
   search: Search,
 };
 
-// Central route paths – change a URL once, updates everywhere.
 export const ROUTES = {
   home: "/",
   shop: "/shop",
@@ -31,16 +28,23 @@ export const ROUTES = {
   login: "/login",
 };
 
-// Helper to build a product detail path
 export function productPath(slug) {
-  return `/product/${slug}`;
+  return `${ROUTES.product}/${slug}`;
 }
 
-// All navigation links shared between BottomNav and TopNav.
-// Uses ROUTES so a path change in ROUTES affects both navs instantly.
+export function orderPath(id) {
+  return `${ROUTES.orders}/${id}`;
+}
+
 export const NAV_LINKS = [
   { key: "shop", label: "Shop", icon: "shop", path: ROUTES.shop, end: true },
-  { key: "orders", label: "Orders", icon: "orders", path: ROUTES.orders },
+  {
+    key: "orders",
+    label: "Orders",
+    icon: "orders",
+    path: ROUTES.orders,
+    end: true,
+  },
   { key: "cart", label: "Cart", icon: "cart", path: ROUTES.cart, badge: true },
   { key: "profile", label: "Profile", icon: "profile", path: ROUTES.profile },
 ];

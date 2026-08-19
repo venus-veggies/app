@@ -32,8 +32,6 @@ export const COPY = {
   cartTitle: "Your basket",
   cartCheckout: "Proceed to checkout",
   cartClear: "Clear cart",
-  cartCheckoutNotWired:
-    "Checkout isn't wired up yet — hook this up to your backend.",
 
   // ---------- Order summary ----------
   orderSummaryTitle: "Order summary",
@@ -55,7 +53,6 @@ export const COPY = {
 
   // ---------- Profile ----------
   editProfileAria: "Edit profile",
-  editProfileNotWired: "Edit profile isn't wired up yet.",
   notSignedIn: "Not signed in",
   menuItems: [
     { label: "My Orders", key: "orders" },
@@ -87,7 +84,6 @@ export const COPY = {
   editAddress: "Edit",
 };
 
-// Helper to replace template placeholders like {{query}}
 export function tpl(str, replacements) {
   return str.replace(/\{\{(\w+)\}\}/g, (_, key) => replacements[key] ?? "");
 }
