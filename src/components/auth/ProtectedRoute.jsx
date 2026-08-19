@@ -1,5 +1,6 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { Spinner } from "../ui/Spinner";
 import { ROUTES } from "../../config/navigation";
 
 export default function ProtectedRoute() {
@@ -9,7 +10,7 @@ export default function ProtectedRoute() {
   if (loading) {
     return (
       <div className="flex justify-center py-20">
-        <div className="w-8 h-8 border-4 border-leaf-200 border-t-leaf-600 rounded-full animate-spin" />
+        <Spinner size="lg" />
       </div>
     );
   }
