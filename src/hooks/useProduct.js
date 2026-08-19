@@ -1,43 +1,16 @@
-import { useState, useEffect } from "react";
+import { useAsyncData } from "./useAsyncData";
 import { getProductBySlug } from "../data/products";
 
 export function useProduct(slug) {
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data, loading, error } = useAsyncData(
+    (signal) => getProductBySlug(slug, signal),
+    [slug],
+    { initialData: null, enabled: !!slug },
+  );
 
-  useEffect(() => {
-    if (!slug) return;
+  // Treat 404 as "product not found" without showing an error
+  const product = error?.response?.status === 404 ? null : data;
+  const finalError = error?.response?.status === 404 ? null : error;
 
-    let cancelled = false;
-    setLoading(true);
-    setProduct(null);
-    setError(null);
-
-    getProductBySlug(slug)
-      .then((data) => {
-        if (!cancelled) {
-          setProduct(data);
-          setError(null);
-        }
-      })
-      .catch((err) => {
-        if (!cancelled) {
-          if (err.response?.status === 404) {
-            setProduct(null);
-          } else {
-            setError(err.response?.data?.message || "Failed to load product");
-          }
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [slug]);
-
-  return { product, loading, error };
+  return { product, loading, error: finalError };
 }

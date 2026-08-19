@@ -12,7 +12,7 @@ export async function placeOrder(payload) {
   return data;
 }
 
-export async function getOrderById(id) {
-  const { data } = await api.get(`/orders/${id}`);
+export async function getOrderById(id, signal = undefined) {
+  const { data } = await api.get(`/orders/${id}`, { signal });
   return data.data ?? data;
 }
