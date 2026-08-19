@@ -1,136 +1,63 @@
+# Venus PWA — Architecture Overview
 
-
-### `architecture.md`
-
-```markdown
-# Architecture
-
-Venus PWA is a mobile‑first Progressive Web App built with **React 19**, **Vite**, and **React Router 7**. All state is handled through the React Context API — no external state management library is used. Styling is done with **Tailwind CSS v4**, driven by a custom design‑token system defined in `src/index.css`. The app talks to a separate Laravel backend via a single Axios client.
+Venus PWA is a mobile-first Progressive Web App built with React 19, Vite, and React Router 7. State is managed with React Context, styling with Tailwind CSS v4, and the backend is a separate Laravel API.
 
 ---
 
-## Source tree
-```
+## Core Files (read these first)
 
-src/
-├── api/
-│ └── client.js Axios instance (base URL, auth header, error toasts)
-├── components/
-│ ├── auth/
-│ │ └── ProtectedRoute.jsx
-│ ├── cart/
-│ │ ├── CartLineItem.jsx
-│ │ └── OrderSummary.jsx
-│ ├── hero/
-│ │ └── Hero.jsx
-│ ├── layout/
-│ │ ├── BottomNav.jsx
-│ │ ├── MainLayout.jsx
-│ │ └── TopNav.jsx
-│ ├── product/
-│ │ ├── ProductCard.jsx
-│ │ └── ProduceBadge.jsx
-│ ├── ui/
-│ │ ├── Button.jsx
-│ │ └── QuantityStepper.jsx
-│ ├── ErrorBoundary.jsx
-│ └── ScrollToTop.jsx
-├── config/
-│ ├── constants.js Delivery fee, thresholds, debounce, pagination
-│ ├── copy.js Every user‑facing string
-│ └── navigation.js Route paths, nav links, icon map
-├── content/
-│ └── brand.js Locality, headline, tagline, delivery promise
-├── context/
-│ ├── AuthContext.jsx Token, user, rehydration, login/logout
-│ └── CartContext.jsx Cart state, persistence, guest‑merge
-├── data/
-│ ├── categories.js getCategories()
-│ └── products.js getProducts(), getProductBySlug()
-├── hooks/
-│ ├── useAddToCart.js
-│ ├── useDebouncedValue.js
-│ ├── useDocumentTitle.js
-│ ├── usePrevious.js (reserved for future use)
-│ ├── useProduct.js
-│ └── useProducts.js
-├── pages/
-│ ├── Cart.jsx
-│ ├── Login.jsx
-│ ├── NotFound.jsx
-│ ├── Orders.jsx (placeholder)
-│ ├── ProductDetail.jsx
-│ ├── Products.jsx
-│ └── Profile.jsx
-├── App.jsx Root component: providers, routes, error boundary
-├── index.css Tailwind import + design tokens + typography
-└── main.jsx Entry point
+| File                                   | Purpose                                                            |
+| -------------------------------------- | ------------------------------------------------------------------ |
+| `src/App.jsx`                          | Routing, providers, global error boundary                          |
+| `src/config/navigation.js`             | Route paths, nav links, icons, path helpers                        |
+| `src/config/constants.js`              | Delivery fee, threshold, debounce, pagination, currency formatting |
+| `src/config/copy.js`                   | All user-facing text                                               |
+| `src/content/brand.js`                 | Brand identity (locality, headline, tagline)                       |
+| `src/api/client.js`                    | Axios instance, token attach, error toasts                         |
+| `src/data/products.js`                 | Product and category API calls                                     |
+| `src/data/orders.js`                   | Order API calls                                                    |
+| `src/hooks/useAsyncData.js`            | Generic async hook (loading, error, cancellation)                  |
+| `src/hooks/useProducts.js`             | Products list hook                                                 |
+| `src/hooks/useProduct.js`              | Single product hook                                                |
+| `src/context/AuthContext.jsx`          | Authentication state and actions                                   |
+| `src/context/CartContext.jsx`          | Cart state, persistence, guest merge                               |
+| `src/components/layout/MainLayout.jsx` | App shell (top nav, bottom nav, outlet)                            |
 
-
-
-
-
-## Application shell
-
-`main.jsx` mounts `<App />` into the DOM. `App.jsx` is the sole orchestration point:
-
-1. Wraps everything in `<AuthProvider>` and `<CartProvider>`.
-2. Adds a global `<ErrorBoundary>` and a `<Toaster>` (react-hot-toast).
-3. Defines all routes inside `<BrowserRouter>` and `<MainLayout>`.
-
-`MainLayout` provides the persistent shell:
-- `<TopNav />` — sticky header (desktop) / search bar + delivery info (mobile).
-- `<Outlet />` — the currently active page.
-- `<BottomNav />` — fixed mobile tab bar.
-`<ScrollToTop>` component resets scroll position on every route change.
+These files reveal 90% of the architecture. Everything else is a page or reusable UI component following the same patterns.
 
 ---
 
-## Data flow
+## Data Flow
 
-### 1. Auth & cart
-`AuthContext` holds the current user, a JWT token in `localStorage`, and a `loading` flag for rehydration. `CartContext` depends on `AuthContext`; it scopes cart data to `cart_guest` (before login) or `cart_{userId}` (after login). On successful login, guest items are merged automatically and the guest key is removed.
-
-All sensitive routes (`/cart`, `/orders`, `/profile`) are wrapped in `<ProtectedRoute>`. That component checks `AuthContext` and redirects to `/login` only *after* rehydration is complete, preventing a flash of the login page on refresh.
-
-### 2. Products & categories
-- `data/products.js` and `data/categories.js` make raw HTTP requests through `api/client.js`.
-- `hooks/useProducts.js` and `hooks/useProduct.js` wrap those calls with loading, error, debounced search, and request cancellation.
-- Page components (`Products.jsx`, `ProductDetail.jsx`) **never** call the data layer directly. They consume the hooks.
-
-### 3. Cart actions
-`hooks/useAddToCart.js` combines `CartContext.addItem` with a toast notification. Both `ProductCard` and `ProductDetail` use this single hook rather than duplicating add‑to‑cart logic.
-
-### 4. Configuration
-Every route, nav link, icon, constant, and user‑facing string is stored in `src/config/` and `src/content/`. Components import these directly — there is no prop‑drilling of configuration.
+1. **API Layer** — `api/client.js` is the only place that imports Axios. It adds the token and handles error toasts.
+2. **Data Functions** — `data/products.js` and `data/orders.js` call the API and return normalized shapes.
+3. **Hooks** — `useProducts`, `useProduct`, `useOrders`, `useOrder` use `useAsyncData` for loading/error/cancellation. Pages never call the data layer directly.
+4. **Contexts** — `AuthContext` and `CartContext` manage global state and localStorage.
+5. **UI** — Components consume hooks/contexts. Shared UI primitives live in `components/ui/`.
 
 ---
 
-## Routing table
+## Key Patterns
 
-| Path | Component | Auth | Notes |
-|------|-----------|------|-------|
-| `/` | `Products` | Public | Same as `/shop` |
-| `/shop` | `Products` | Public | Primary storefront |
-| `/product/:slug` | `ProductDetail` | Public | Variant selector, add‑to‑cart |
-| `/login` | `Login` | Public | Phone + password |
-| `/cart` | `Cart` | Protected | Line items, order summary |
-| `/orders` | `Orders` | Protected | Placeholder page |
-| `/profile` | `Profile` | Protected | Menu, logout |
-| `/products` | Redirect → `/shop` | Public | Backwards compatibility |
-| `*` | `NotFound` | Public | Friendly 404 |
-
-All paths are defined once in `config/navigation.js` under the `ROUTES` object and referenced by that key everywhere else.
+- **No state manager** — Context is enough.
+- **Centralized config/copy** — routes, labels, fees, and brand live in one place.
+- **Variant-aware cart** — cart items keyed by `slug_variantId`.
+- **Guest cart merge** — handled in `utils/cartStorage.js`.
+- **Environment-aware API base URL** — via `VITE_API_BASE_URL`.
 
 ---
 
-## Key design decisions
+## Routing
 
-- **No global state manager** — at this scale, React Context is sufficient and avoids adding dependencies.
-- **Feature‑based component grouping** — components live in folders named after their domain (`cart/`, `product/`, `hero/`). Shared primitives go in `ui/`.
-- **Centralized copy and config** — changing a label, a route, or a fee means editing one file, not searching through components.
-- **Real API from day one** — the app never shipped with mock data. All product and category information comes from the Laravel backend via the API client.
-- **Honest UI** — placeholder pages and features that aren't wired up tell the user so directly rather than pretending they work.
-```
+| Path             | Component       | Auth      | Notes                  |
+| ---------------- | --------------- | --------- | ---------------------- |
+| `/`              | `Products`      | Public    | Same as `/shop`        |
+| `/shop`          | `Products`      | Public    | Storefront             |
+| `/product/:slug` | `ProductDetail` | Public    | Variant selector       |
+| `/login`         | `Login`         | Public    | Phone + password       |
+| `/cart`          | `Cart`          | Protected | Checkout               |
+| `/orders`        | `Orders`        | Protected | Order list             |
+| `/orders/:id`    | `OrderDetail`   | Protected | Order detail + reorder |
+| `/profile`       | `Profile`       | Protected | Account/address        |
 
-
+All paths are defined in `config/navigation.js` and imported elsewhere.
