@@ -1,9 +1,7 @@
 import api from "../api/client";
 
-export async function getOrders() {
-  const { data } = await api.get("/orders");
-
-  // Laravel resource collections often wrap in { data: [...] }
+export async function getOrders(signal = undefined) {
+  const { data } = await api.get("/orders", { signal });
   return Array.isArray(data) ? data : (data.data ?? []);
 }
 
