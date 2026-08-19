@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
 import { Sprout } from "lucide-react";
 import { useOrders } from "../hooks/useOrders";
-import { orderPath, ROUTES } from "../config/navigation";
+import { SubPageHeader } from "../components/ui/SubPageHeader";
+import { LoadingSkeleton } from "../components/ui/LoadingSkeleton";
+import { EmptyState } from "../components/ui/EmptyState";
+import { ROUTES, orderPath } from "../config/navigation";
 import { COPY } from "../config/copy";
 import { formatINR } from "../config/constants";
 
@@ -15,12 +18,7 @@ export default function Orders() {
   const { orders, loading, error } = useOrders();
 
   if (loading) {
-    return (
-      <div className="py-20 text-center animate-pulse space-y-4">
-        <div className="h-6 bg-leaf-100 rounded w-1/3 mx-auto" />
-        <div className="h-4 bg-leaf-100 rounded w-1/2 mx-auto" />
-      </div>
-    );
+    return <LoadingSkeleton />;
   }
 
   if (error) {
@@ -37,7 +35,7 @@ export default function Orders() {
   if (orders.length === 0) {
     return (
       <EmptyState
-        icon={<Sprout size={32} />}
+        icon={<Sprout size={32} className="text-leaf-400" />}
         title="No orders yet"
         message={COPY.cartEmptyHint}
         actionLabel={COPY.cartStartShopping}
@@ -48,7 +46,7 @@ export default function Orders() {
 
   return (
     <div className="pb-10">
-      <h1 className="type-hero mb-4">My Orders</h1>
+      <SubPageHeader title="My Orders" backTo={ROUTES.profile} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
         {orders.map((order) => (
