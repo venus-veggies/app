@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Search, SlidersHorizontal, Sprout } from "lucide-react";
-import { getCategories } from "../data/categories";
+import { getCategories } from "../data/products";
 import { useProducts } from "../hooks/useProducts";
 import ProductCard from "../components/product/ProductCard";
 import Hero from "../components/hero/Hero";

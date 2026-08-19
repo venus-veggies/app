@@ -1,6 +1,11 @@
 import api from "../api/client";
 import { DEFAULT_PER_PAGE } from "../config/constants";
 
+export async function getCategories() {
+  const { data } = await api.get("/categories");
+  return Array.isArray(data) ? data : (data.data ?? []);
+}
+
 export async function getProducts(filters = {}, signal = undefined) {
   const params = {};
   if (filters.search) params.search = filters.search;

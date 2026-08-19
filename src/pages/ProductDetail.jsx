@@ -4,7 +4,6 @@ import { Truck, Leaf as LeafIcon, Hand } from "lucide-react";
 import { QuantityStepper } from "../components/ui/QuantityStepper";
 import { Button } from "../components/ui/Button";
 import { SubPageHeader } from "../components/ui/SubPageHeader";
-import { ProduceBadge } from "../components/product";
 import { getProducts } from "../data/products";
 import { useProduct } from "../hooks/useProduct";
 import { useAddToCart } from "../hooks/useAddToCart";
@@ -12,6 +11,7 @@ import useDocumentTitle from "../hooks/useDocumentTitle";
 import { ROUTES } from "../config/navigation";
 import { COPY } from "../config/copy";
 import { formatINR } from "../config/constants";
+import ProduceBadge from "../components/product/ProduceBadge";
 
 const FACTS = [
   { icon: LeafIcon, label: COPY.farmFresh },
