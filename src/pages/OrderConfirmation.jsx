@@ -29,6 +29,8 @@ export default function OrderConfirmation() {
     );
   }
 
+  const customerNote = order.notes?.find((n) => n.author === "customer")?.body;
+
   return (
     <div className="pb-8">
       <SubPageHeader title="Order Confirmation" backTo={ROUTES.shop} />
@@ -89,6 +91,13 @@ export default function OrderConfirmation() {
             <h2 className="type-section mb-2">Delivery Address</h2>
             <p className="text-sm text-body">{order.address || "—"}</p>
           </div>
+
+          {customerNote && (
+            <div className="bg-surface rounded-card shadow-card p-4">
+              <h2 className="type-section mb-2">Your Note</h2>
+              <p className="text-sm text-body">{customerNote}</p>
+            </div>
+          )}
         </div>
       </div>
 
