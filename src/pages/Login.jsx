@@ -7,7 +7,7 @@ import { ROUTES } from "../config/navigation";
 import { COPY } from "../config/copy";
 
 export default function Login() {
-  const [mode, setMode] = useState("login");
+  const [mode, setMode] = useState("login"); // 'login', 'signup', 'reset'
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
@@ -17,7 +17,7 @@ export default function Login() {
   const [otpSent, setOtpSent] = useState(false);
   const [sendingOtp, setSendingOtp] = useState(false);
 
-  const { login, register, requestOtp } = useAuth();
+  const { login, register, requestOtp, resetPassword } = useAuth();
   const navigate = useNavigate();
 
   const handleSendOtp = async () => {
@@ -38,6 +38,29 @@ export default function Login() {
     }
   };
 
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    setError(null);
+    if (!phone.trim() || !otp.trim() || !password.trim()) {
+      toast.error("Phone, OTP, and new password are required.");
+      return;
+    }
+    try {
+      await resetPassword({
+        phone: phone.trim(),
+        otp: otp.trim(),
+        new_password: password,
+      });
+      toast.success("Password reset successful. Please login.");
+      setMode("login");
+      setOtpSent(false);
+      setOtp("");
+      setPassword("");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to reset password");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
@@ -52,7 +75,7 @@ export default function Login() {
       return;
     }
 
-    // Signup mode
+    // signup mode
     if (!name.trim() || !phone.trim() || !password.trim() || !otp.trim()) {
       toast.error("All fields are required.");
       return;
@@ -79,7 +102,7 @@ export default function Login() {
       <div className="flex-1 px-5">
         <div className="max-w-sm mx-auto -mt-10 bg-surface rounded-card shadow-card p-6">
           <div className="flex bg-page rounded-pill p-1 mb-5">
-            {["login", "signup"].map((m) => (
+            {["login", "signup", "reset"].map((m) => (
               <button
                 key={m}
                 onClick={() => {
@@ -92,93 +115,163 @@ export default function Login() {
                   mode === m ? "bg-leaf-500 text-white" : "text-body"
                 }`}
               >
-                {m === "login" ? "Login" : "Signup"}
+                {m === "login" ? "Login" : m === "signup" ? "Signup" : "Reset"}
               </button>
             ))}
           </div>
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-            {mode === "signup" && (
+          {mode === "reset" ? (
+            <form
+              onSubmit={handleResetPassword}
+              className="flex flex-col gap-3"
+            >
               <label className="flex items-center gap-2 border border-border rounded-btn px-3 py-2.5">
-                <User size={16} className="text-muted shrink-0" />
+                <Phone size={16} className="text-muted shrink-0" />
                 <input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder={COPY.fullNamePlaceholder}
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="Phone number"
+                  type="tel"
                   className="w-full text-sm outline-none placeholder:text-muted"
                   required
                 />
               </label>
-            )}
 
-            <label className="flex items-center gap-2 border border-border rounded-btn px-3 py-2.5">
-              <Phone size={16} className="text-muted shrink-0" />
-              <input
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder={COPY.phonePlaceholder}
-                type="tel"
-                className="w-full text-sm outline-none placeholder:text-muted"
-                required
-              />
-            </label>
-
-            {mode === "signup" && (
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={handleSendOtp}
-                  disabled={sendingOtp}
-                  className="shrink-0 px-4 py-2 rounded-btn border border-leaf-200 text-leaf-700 text-sm font-medium hover:bg-leaf-100 transition"
-                >
-                  {sendingOtp ? "Sending…" : otpSent ? "Resend" : "Send OTP"}
-                </button>
-                {otpSent && (
-                  <input
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    placeholder="OTP"
-                    inputMode="numeric"
-                    className="w-full text-sm outline-none border border-border rounded-btn px-3 py-2"
-                    required
-                  />
-                )}
-              </div>
-            )}
-
-            <label className="flex items-center gap-2 border border-border rounded-btn px-3 py-2.5">
-              <Lock size={16} className="text-muted shrink-0" />
-              <input
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder={COPY.passwordPlaceholder}
-                type={showPassword ? "text" : "password"}
-                className="w-full text-sm outline-none placeholder:text-muted"
-                required
-              />
               <button
                 type="button"
-                onClick={() => setShowPassword((s) => !s)}
-                className="text-muted shrink-0"
-                aria-label={
-                  showPassword ? COPY.hidePasswordAria : COPY.showPasswordAria
-                }
+                onClick={handleSendOtp}
+                disabled={sendingOtp}
+                className="px-4 py-2 rounded-btn border border-leaf-200 text-leaf-700 text-sm font-medium hover:bg-leaf-100 transition"
               >
-                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                {sendingOtp ? "Sending…" : otpSent ? "Resend OTP" : "Send OTP"}
               </button>
-            </label>
 
-            {error && (
-              <p className="text-tomato-600 text-sm text-center">{error}</p>
-            )}
+              <label className="flex items-center gap-2 border border-border rounded-btn px-3 py-2.5">
+                <Lock size={16} className="text-muted shrink-0" />
+                <input
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  placeholder="OTP"
+                  inputMode="numeric"
+                  className="w-full text-sm outline-none placeholder:text-muted"
+                  required
+                />
+              </label>
 
-            <button
-              type="submit"
-              className="mt-2 bg-leaf-500 hover:bg-leaf-600 text-white font-medium rounded-pill py-3 transition-all active:scale-95"
-            >
-              {mode === "login" ? "Log in" : "Create Account"}
-            </button>
-          </form>
+              <label className="flex items-center gap-2 border border-border rounded-btn px-3 py-2.5">
+                <Lock size={16} className="text-muted shrink-0" />
+                <input
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="New password"
+                  type={showPassword ? "text" : "password"}
+                  className="w-full text-sm outline-none placeholder:text-muted"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((s) => !s)}
+                  className="text-muted shrink-0"
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </label>
+
+              {error && (
+                <p className="text-tomato-600 text-sm text-center">{error}</p>
+              )}
+
+              <button
+                type="submit"
+                className="mt-2 bg-leaf-500 hover:bg-leaf-600 text-white font-medium rounded-pill py-3 transition-all active:scale-95"
+              >
+                Reset Password
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+              {mode === "signup" && (
+                <label className="flex items-center gap-2 border border-border rounded-btn px-3 py-2.5">
+                  <User size={16} className="text-muted shrink-0" />
+                  <input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder={COPY.fullNamePlaceholder}
+                    className="w-full text-sm outline-none placeholder:text-muted"
+                    required
+                  />
+                </label>
+              )}
+
+              <label className="flex items-center gap-2 border border-border rounded-btn px-3 py-2.5">
+                <Phone size={16} className="text-muted shrink-0" />
+                <input
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder={COPY.phonePlaceholder}
+                  type="tel"
+                  className="w-full text-sm outline-none placeholder:text-muted"
+                  required
+                />
+              </label>
+
+              {mode === "signup" && (
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={handleSendOtp}
+                    disabled={sendingOtp}
+                    className="shrink-0 px-4 py-2 rounded-btn border border-leaf-200 text-leaf-700 text-sm font-medium hover:bg-leaf-100 transition"
+                  >
+                    {sendingOtp ? "Sending…" : otpSent ? "Resend" : "Send OTP"}
+                  </button>
+                  {otpSent && (
+                    <input
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                      placeholder="OTP"
+                      inputMode="numeric"
+                      className="w-full text-sm outline-none border border-border rounded-btn px-3 py-2"
+                      required
+                    />
+                  )}
+                </div>
+              )}
+
+              <label className="flex items-center gap-2 border border-border rounded-btn px-3 py-2.5">
+                <Lock size={16} className="text-muted shrink-0" />
+                <input
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder={COPY.passwordPlaceholder}
+                  type={showPassword ? "text" : "password"}
+                  className="w-full text-sm outline-none placeholder:text-muted"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((s) => !s)}
+                  className="text-muted shrink-0"
+                  aria-label={
+                    showPassword ? COPY.hidePasswordAria : COPY.showPasswordAria
+                  }
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </label>
+
+              {error && (
+                <p className="text-tomato-600 text-sm text-center">{error}</p>
+              )}
+
+              <button
+                type="submit"
+                className="mt-2 bg-leaf-500 hover:bg-leaf-600 text-white font-medium rounded-pill py-3 transition-all active:scale-95"
+              >
+                {mode === "login" ? "Log in" : "Create Account"}
+              </button>
+            </form>
+          )}
 
           <button
             onClick={() => navigate(ROUTES.shop)}

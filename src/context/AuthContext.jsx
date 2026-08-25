@@ -56,6 +56,10 @@ export function AuthProvider({ children }) {
     setUser(data.user);
   }, []);
 
+  const resetPassword = useCallback(async ({ phone, otp, new_password }) => {
+    await api.post("/reset-password", { phone, otp, new_password });
+  }, []);
+
   const logout = useCallback(async () => {
     try {
       await api.post("/logout");
@@ -80,6 +84,7 @@ export function AuthProvider({ children }) {
       register,
       requestOtp,
       verifyOtp,
+      resetPassword,
       updateProfile,
       logout,
     }),
@@ -90,6 +95,7 @@ export function AuthProvider({ children }) {
       register,
       requestOtp,
       verifyOtp,
+      resetPassword,
       updateProfile,
       logout,
     ],
