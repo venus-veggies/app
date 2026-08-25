@@ -186,28 +186,6 @@ body {
   color: var(--color-muted);
 }
 
-:focus-visible {
-  outline: none;
-  box-shadow:
-    0 0 0 2px var(--color-page),
-    0 0 0 4px var(--color-leaf-500);
-}
-
 img {
   background-color: var(--color-leaf-100);
-}
-
-/* Remove default ugly focus outlines */
-input,
-textarea,
-select {
-  outline: none !important;
-}
-
-/* Smooth focus ring that follows rounded corners */
-input:focus,
-textarea:focus,
-select:focus {
-  border-color: var(--color-leaf-500) !important;
-  box-shadow: 0 0 0 3px rgba(74, 158, 63, 0.15) !important;
 }
