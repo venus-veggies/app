@@ -36,6 +36,7 @@ export default function Cart() {
     !user?.address_line1 || !user?.pincode,
   );
   const [placing, setPlacing] = useState(false);
+  const [note, setNote] = useState("");
 
   // Revalidate cart prices against the server whenever the cart changes
   useEffect(() => {
@@ -125,6 +126,7 @@ export default function Cart() {
         landmark: address.landmark,
         pincode: address.pincode,
         payment_method: "cod",
+        note,
         items,
       });
 
@@ -233,6 +235,20 @@ export default function Cart() {
                 <p className="font-medium">{address.pincode}</p>
               </div>
             )}
+
+            {/* Delivery Instructions note */}
+            <div>
+              <label className="block text-sm font-medium text-text-body mb-1">
+                Delivery Instructions (optional)
+              </label>
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                rows={2}
+                placeholder="e.g. Call on arrival, leave at gate, or any special request"
+                className="w-full border border-border rounded-btn px-3 py-2 text-sm outline-none placeholder:text-muted resize-none"
+              />
+            </div>
 
             <Button type="submit" className="w-full py-3" disabled={placing}>
               {placing ? "Placing order…" : COPY.cartCheckout}

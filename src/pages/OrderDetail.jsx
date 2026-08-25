@@ -1,9 +1,10 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { RotateCcw, Sprout } from "lucide-react";
+import toast from "react-hot-toast";
 import { useOrder } from "../hooks/useOrder";
 import { useCart } from "../context/CartContext";
-import toast from "react-hot-toast";
 import { SubPageHeader } from "../components/ui/SubPageHeader";
+import { FeedbackSection } from "../components/feedback/FeedbackSection";
 import { ROUTES } from "../config/navigation";
 import { formatINR } from "../config/constants";
 
@@ -193,6 +194,8 @@ export default function OrderDetail() {
               </p>
             </div>
           )}
+
+          <FeedbackSection orderId={order.id} orderStatus={order.status} />
         </div>
       </div>
     </div>
