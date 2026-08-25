@@ -16,8 +16,16 @@ export function ResetPasswordForm({ onBackToLogin }) {
     e.preventDefault();
     setError(null);
 
-    if (!phone.trim() || !otp.trim() || !password.trim()) {
-      toast.error("Phone, OTP, and new password are required.");
+    if (!phone.trim()) {
+      setError("Please enter your phone number.");
+      return;
+    }
+    if (!otp.trim()) {
+      setError("Please enter the OTP sent to your phone.");
+      return;
+    }
+    if (!password.trim()) {
+      setError("Please enter a new password.");
       return;
     }
 
