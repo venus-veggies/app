@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ROUTES } from "./config/navigation";
 import ScrollToTop from "./components/ScrollToTop";
+import OrderConfirmation from "./pages/OrderConfirmation";
 
 export default function App() {
   return (
@@ -54,6 +55,10 @@ export default function App() {
                   <Route
                     path={`${ROUTES.orders}/:id`}
                     element={<OrderDetail />}
+                  />
+                  <Route
+                    path="order-confirmation/:id"
+                    element={<OrderConfirmation />}
                   />
                   <Route path={ROUTES.profile} element={<Profile />} />
                 </Route>

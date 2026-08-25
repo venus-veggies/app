@@ -119,7 +119,7 @@ export default function Cart() {
 
     setPlacing(true);
     try {
-      await placeOrder({
+      const orderResult = await placeOrder({
         address_line1: address.address_line1,
         address_line2: address.address_line2,
         landmark: address.landmark,
@@ -130,7 +130,7 @@ export default function Cart() {
 
       clearCart();
       toast.success("Order placed successfully!");
-      navigate(ROUTES.orders);
+      navigate(`/order-confirmation/${orderResult.data.id}`);
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to place order");
     } finally {
