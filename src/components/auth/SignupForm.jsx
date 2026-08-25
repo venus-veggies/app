@@ -18,8 +18,20 @@ export function SignupForm({ onSuccess }) {
     e.preventDefault();
     setError(null);
 
-    if (!name.trim() || !phone.trim() || !password.trim() || !otp.trim()) {
-      toast.error("All fields are required.");
+    if (!name.trim()) {
+      setError("Please enter your full name.");
+      return;
+    }
+    if (!phone.trim()) {
+      setError("Please enter your phone number.");
+      return;
+    }
+    if (!otp.trim()) {
+      setError("Please enter the OTP sent to your phone.");
+      return;
+    }
+    if (!password.trim()) {
+      setError("Please create a password.");
       return;
     }
 
