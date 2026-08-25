@@ -14,7 +14,6 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Rehydrate user on mount if a token exists
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -46,11 +45,22 @@ export function AuthProvider({ children }) {
     setUser(data.user);
   }, []);
 
+  const requestOtp = useCallback(async (phone) => {
+    await api.post("/request-otp", { phone });
+    // No OTP returned; admin sees it in /dev/otps
+  }, []);
+
+  const verifyOtp = useCallback(async ({ phone, otp }) => {
+    const { data } = await api.post("/verify-otp", { phone, otp });
+    localStorage.setItem("token", data.token);
+    setUser(data.user);
+  }, []);
+
   const logout = useCallback(async () => {
     try {
       await api.post("/logout");
     } catch {
-      // ignore logout errors – token is removed regardless
+      // ignore
     }
     localStorage.removeItem("token");
     setUser(null);
@@ -68,10 +78,21 @@ export function AuthProvider({ children }) {
       isAuthenticated: !!user,
       login,
       register,
+      requestOtp,
+      verifyOtp,
       updateProfile,
       logout,
     }),
-    [user, loading, login, register, updateProfile, logout],
+    [
+      user,
+      loading,
+      login,
+      register,
+      requestOtp,
+      verifyOtp,
+      updateProfile,
+      logout,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
