@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Leaf, Lock, Phone, User, Eye, EyeOff } from "lucide-react";
+import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
 import { ROUTES } from "../config/navigation";
 import { COPY } from "../config/copy";
@@ -10,29 +11,60 @@ export default function Login() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [otp, setOtp] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
-  const { login, register } = useAuth();
+  const [otpSent, setOtpSent] = useState(false);
+  const [sendingOtp, setSendingOtp] = useState(false);
+
+  const { login, register, requestOtp } = useAuth();
   const navigate = useNavigate();
+
+  const handleSendOtp = async () => {
+    setError(null);
+    if (!phone.trim()) {
+      toast.error("Phone number is required.");
+      return;
+    }
+    setSendingOtp(true);
+    try {
+      await requestOtp(phone.trim());
+      setOtpSent(true);
+      toast.success("OTP sent. Check admin OTP logs.");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to send OTP");
+    } finally {
+      setSendingOtp(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
 
-    try {
-      if (mode === "login") {
+    if (mode === "login") {
+      try {
         await login({ phone, password });
-      } else {
-        await register({ name, phone, password });
+        navigate(ROUTES.shop);
+      } catch (err) {
+        setError(err.response?.data?.message || COPY.loginFailed);
       }
+      return;
+    }
+
+    // Signup mode
+    if (!name.trim() || !phone.trim() || !password.trim() || !otp.trim()) {
+      toast.error("All fields are required.");
+      return;
+    }
+
+    try {
+      await register({ name, phone, password, otp });
       navigate(ROUTES.shop);
     } catch (err) {
-      const message = err.response?.data?.message || COPY.loginFailed;
-      setError(message);
+      setError(err.response?.data?.message || "Registration failed");
     }
   };
-
-  const tabLabel = mode === "login" ? COPY.loginTab : COPY.signupTab;
 
   return (
     <div className="min-h-screen flex flex-col bg-page">
@@ -50,12 +82,17 @@ export default function Login() {
             {["login", "signup"].map((m) => (
               <button
                 key={m}
-                onClick={() => setMode(m)}
+                onClick={() => {
+                  setMode(m);
+                  setError(null);
+                  setOtpSent(false);
+                  setOtp("");
+                }}
                 className={`flex-1 text-sm font-medium py-2 rounded-pill transition-colors capitalize ${
                   mode === m ? "bg-leaf-500 text-white" : "text-body"
                 }`}
               >
-                {m === "login" ? COPY.loginTab : COPY.signupTab}
+                {m === "login" ? "Login" : "Signup"}
               </button>
             ))}
           </div>
@@ -70,7 +107,6 @@ export default function Login() {
                   placeholder={COPY.fullNamePlaceholder}
                   className="w-full text-sm outline-none placeholder:text-muted"
                   required
-                  aria-label={COPY.fullNameAria}
                 />
               </label>
             )}
@@ -84,9 +120,31 @@ export default function Login() {
                 type="tel"
                 className="w-full text-sm outline-none placeholder:text-muted"
                 required
-                aria-label={COPY.phoneAria}
               />
             </label>
+
+            {mode === "signup" && (
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={handleSendOtp}
+                  disabled={sendingOtp}
+                  className="shrink-0 px-4 py-2 rounded-btn border border-leaf-200 text-leaf-700 text-sm font-medium hover:bg-leaf-100 transition"
+                >
+                  {sendingOtp ? "Sending…" : otpSent ? "Resend" : "Send OTP"}
+                </button>
+                {otpSent && (
+                  <input
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    placeholder="OTP"
+                    inputMode="numeric"
+                    className="w-full text-sm outline-none border border-border rounded-btn px-3 py-2"
+                    required
+                  />
+                )}
+              </div>
+            )}
 
             <label className="flex items-center gap-2 border border-border rounded-btn px-3 py-2.5">
               <Lock size={16} className="text-muted shrink-0" />
@@ -97,7 +155,6 @@ export default function Login() {
                 type={showPassword ? "text" : "password"}
                 className="w-full text-sm outline-none placeholder:text-muted"
                 required
-                aria-label={COPY.passwordAria}
               />
               <button
                 type="button"
@@ -114,11 +171,12 @@ export default function Login() {
             {error && (
               <p className="text-tomato-600 text-sm text-center">{error}</p>
             )}
+
             <button
               type="submit"
-              className="mt-2 bg-leaf-500 hover:bg-leaf-600 text-white font-medium rounded-pill py-3 transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf-500"
+              className="mt-2 bg-leaf-500 hover:bg-leaf-600 text-white font-medium rounded-pill py-3 transition-all active:scale-95"
             >
-              {tabLabel}
+              {mode === "login" ? "Log in" : "Create Account"}
             </button>
           </form>
 
