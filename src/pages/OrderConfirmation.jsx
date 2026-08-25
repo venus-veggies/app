@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router-dom";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Sprout } from "lucide-react";
 import { useOrder } from "../hooks/useOrder";
 import { SubPageHeader } from "../components/ui/SubPageHeader";
 import { ROUTES } from "../config/navigation";
@@ -48,11 +48,26 @@ export default function OrderConfirmation() {
           <h2 className="type-section mb-2">Items</h2>
           <div className="divide-y divide-border">
             {order.items?.map((item, idx) => (
-              <div key={idx} className="flex justify-between py-2 text-sm">
-                <div>
-                  <p className="text-ink">{item.product_name}</p>
+              <div key={idx} className="flex items-center gap-3 py-2 text-sm">
+                {item.image_url ? (
+                  <img
+                    src={item.image_url}
+                    alt={item.product_name}
+                    className="w-12 h-12 rounded-btn object-cover bg-leaf-100"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-btn bg-leaf-100 flex items-center justify-center">
+                    <Sprout size={18} className="text-leaf-600" />
+                  </div>
+                )}
+
+                <div className="flex-1 min-w-0">
+                  <p className="text-ink font-medium line-clamp-2 leading-snug">
+                    {item.product_name}
+                  </p>
                   <p className="text-muted text-xs">Qty: {item.quantity}</p>
                 </div>
+
                 <div className="text-right">
                   <p className="text-body">{formatINR(item.total_price)}</p>
                   <p className="text-muted text-xs">
