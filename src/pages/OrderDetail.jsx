@@ -111,7 +111,6 @@ export default function OrderDetail() {
         </span>
       </div>
 
-      {/* Mobile reorder button */}
       <button
         onClick={handleReorder}
         className="lg:hidden w-full mb-4 py-2.5 px-4 rounded-btn border border-leaf-200 bg-surface text-leaf-700 text-sm font-medium flex items-center justify-center gap-2 hover:bg-leaf-100 active:scale-95 transition-all"
@@ -185,6 +184,15 @@ export default function OrderDetail() {
             <h2 className="type-section mb-2">Delivery Address</h2>
             <p className="text-sm text-body">{order.address || "—"}</p>
           </div>
+
+          {order.notes?.some((n) => n.author === "customer") && (
+            <div className="bg-surface rounded-card shadow-card p-4">
+              <h2 className="type-section mb-2">Your Note</h2>
+              <p className="text-sm text-body">
+                {order.notes.find((n) => n.author === "customer")?.body}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
