@@ -40,7 +40,10 @@ export default function Login() {
           )}
 
           {mode === "login" && (
-            <LoginForm onForgotPassword={() => setMode("reset")} />
+            <LoginForm
+              onForgotPassword={() => setMode("reset")}
+              onSuccess={() => navigate(ROUTES.shop)}
+            />
           )}
           {mode === "signup" && (
             <SignupForm onSuccess={() => navigate(ROUTES.shop)} />

@@ -3,7 +3,7 @@ import { Phone, Lock, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { COPY } from "../../config/copy";
 
-export function LoginForm({ onForgotPassword }) {
+export function LoginForm({ onForgotPassword, onSuccess }) {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -15,7 +15,7 @@ export function LoginForm({ onForgotPassword }) {
     setError(null);
     try {
       await login({ phone, password });
-      // navigation handled in parent
+      onSuccess?.();
     } catch (err) {
       setError(err.response?.data?.message || COPY.loginFailed);
     }
