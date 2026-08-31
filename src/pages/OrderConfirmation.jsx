@@ -107,6 +107,20 @@ export default function OrderConfirmation() {
             <p className="text-sm text-body">{order.address || "—"}</p>
           </div>
 
+          <div className="bg-surface rounded-card shadow-card p-4">
+            <h2 className="type-section mb-2">Payment</h2>
+            <div className="flex justify-between text-sm">
+              <span>Method</span>
+              <span>
+                {order.payment_method === "cod" ? "Cash on Delivery" : "Online"}
+              </span>
+            </div>
+            <div className="flex justify-between text-sm mt-1">
+              <span>Status</span>
+              <span>{order.payment_status || "—"}</span>
+            </div>
+          </div>
+
           {customerNote && (
             <div className="bg-surface rounded-card shadow-card p-4">
               <h2 className="type-section mb-2">Your Note</h2>

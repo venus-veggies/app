@@ -14,7 +14,7 @@ export function PaymentMethodSelector({ value, onChange }) {
           onChange={() => onChange("cod")}
           className="hidden"
         />
-        Cash on Delivery
+        Pay on Delivery
       </label>
       <label
         className={`flex-1 flex items-center justify-center gap-2 border rounded-btn px-3 py-2.5 text-sm cursor-pointer ${
@@ -29,7 +29,7 @@ export function PaymentMethodSelector({ value, onChange }) {
           onChange={() => onChange("online")}
           className="hidden"
         />
-        Online Payment
+        Online (Card/UPI)
       </label>
     </div>
   );
