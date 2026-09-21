@@ -190,11 +190,8 @@ img {
   background-color: var(--color-leaf-100);
 }
 
-/* Focus ring on the outer wrapper, not the inner input */
 label:has(> input:focus),
-div:has(> input:focus),
-label:has(> textarea:focus),
-div:has(> textarea:focus) {
+label:has(> textarea:focus) {
   border-color: var(--color-leaf-500);
   box-shadow: 0 0 0 3px rgba(74, 158, 63, 0.15);
 }

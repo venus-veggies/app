@@ -213,14 +213,14 @@ export function CheckoutForm({ subtotal }) {
 
       <div>
         <label className="block text-sm font-medium text-text-body mb-1">
-          Delivery Instructions (optional)
+          Any request, instruction, or note (optional)
         </label>
         <textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
           rows={2}
-          placeholder="e.g. Call on arrival, leave at gate, or any special request"
-          className="w-full border border-border rounded-btn px-3 py-2 text-sm outline-none placeholder:text-muted resize-none"
+          placeholder="E.g., Please deliver after 5, Add dhania-mirchi"
+          className="w-full border border-border rounded-btn px-3 py-2 text-sm outline-none placeholder:text-muted resize-none focus:ring-2 focus:ring-leaf-500/30 focus:border-leaf-500"
         />
       </div>
 

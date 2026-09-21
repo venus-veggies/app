@@ -200,14 +200,18 @@ export default function OrderDetail() {
             </div>
           </div>
 
-          {order.notes?.some((n) => n.author === "customer") && (
-            <div className="bg-surface rounded-card shadow-card p-4">
-              <h2 className="type-section mb-2">Your Note</h2>
-              <p className="text-sm text-body">
-                {order.notes.find((n) => n.author === "customer")?.body}
-              </p>
-            </div>
-          )}
+          {(() => {
+            const customerNote = order.interactions?.find(
+              (i) => i.type === "note" && i.author_type === "customer",
+            );
+            if (!customerNote) return null;
+            return (
+              <div className="bg-surface rounded-card shadow-card p-4">
+                <h2 className="type-section mb-2">Your Note</h2>
+                <p className="text-sm text-body">{customerNote.body}</p>
+              </div>
+            );
+          })()}
 
           <FeedbackSection orderId={order.id} orderStatus={order.status} />
         </div>
