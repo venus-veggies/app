@@ -4,24 +4,32 @@ import { Plus } from "lucide-react";
 import { useCart } from "../../context/CartContext";
 import { useAddToCart } from "../../hooks/useAddToCart";
 import { productPath } from "../../config/navigation";
+import { formatINR } from "../../config/constants";
 
 export default function ProductCard({ product, className = "" }) {
   const { lineItems } = useCart();
   const addToCart = useAddToCart();
   const [imgError, setImgError] = useState(false);
 
-  // Get first active variant
-  const activeVariant = product.variants?.find((v) => v.status === "active");
+  const activeVariants =
+    product.variants?.filter((v) => v.status === "active") ?? [];
+
+  const activeVariant = activeVariants[0] ?? null;
+  const isAvailable = activeVariants.length > 0;
   const price = activeVariant ? parseFloat(activeVariant.current_price) : 0;
   const unit = activeVariant?.display_label ?? "";
 
-  const inCart =
-    lineItems.find((l) => l.product.slug === product.slug)?.qty ?? 0;
+  const itemKey = activeVariant
+    ? `${product.slug}_${activeVariant.id}`
+    : product.slug;
+
+  const inCart = lineItems.find((l) => l.key === itemKey)?.qty ?? 0;
 
   const handleAdd = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!activeVariant) return;
+    if (!isAvailable || !activeVariant) return;
+
     addToCart(
       {
         slug: product.slug,
@@ -37,7 +45,7 @@ export default function ProductCard({ product, className = "" }) {
   return (
     <Link
       to={productPath(product.slug)}
-      className={`group block bg-surface rounded-card shadow-card hover:shadow-card-hover transition-shadow overflow-hidden ${className}`}
+      className={`group block bg-surface rounded-card shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1 overflow-hidden ${className}`}
     >
       <div className="relative aspect-square bg-leaf-100/60 overflow-hidden">
         {product.image_url && !imgError ? (
@@ -64,22 +72,40 @@ export default function ProductCard({ product, className = "" }) {
             </svg>
           </div>
         )}
-        <button
-          onClick={handleAdd}
-          aria-label={`Add ${product.name} to cart`}
-          className="absolute bottom-2 right-2 min-w-8 h-8 px-1.5 rounded-full bg-leaf-500 hover:bg-leaf-600 text-white flex items-center justify-center gap-1 shadow-float active:scale-95 transition-transform"
-        >
-          <Plus size={16} strokeWidth={2.5} />
-          {inCart > 0 && (
-            <span className="text-xs font-semibold leading-none">{inCart}</span>
-          )}
-        </button>
+
+        {!isAvailable && (
+          <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
+            <span className="bg-surface text-tomato-600 text-xs font-semibold px-3 py-1 rounded-pill shadow-card">
+              Currently unavailable
+            </span>
+          </div>
+        )}
+
+        {isAvailable && (
+          <button
+            onClick={handleAdd}
+            aria-label={`Add ${product.name} to cart`}
+            className="absolute bottom-2 right-2 min-w-8 h-8 px-1.5 rounded-full bg-leaf-500 hover:bg-leaf-600 text-white flex items-center justify-center gap-1 shadow-float active:scale-95 transition-transform"
+          >
+            <Plus size={16} strokeWidth={2.5} />
+            {inCart > 0 && (
+              <span className="text-xs font-semibold leading-none">
+                {inCart}
+              </span>
+            )}
+          </button>
+        )}
       </div>
+
       <div className="p-3">
         <h3 className="type-name truncate">{product.name}</h3>
-        <p className="type-caption mb-1.5">{unit || "Per piece"}</p>
+        <p className="type-caption mb-1.5">
+          {isAvailable ? unit || "Per piece" : "Not available"}
+        </p>
         <div className="flex items-baseline gap-1.5">
-          <span className="type-price">₹{price || "—"}</span>
+          <span className="type-price">
+            {isAvailable ? formatINR(price) : "—"}
+          </span>
         </div>
       </div>
     </Link>

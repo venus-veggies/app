@@ -10,15 +10,19 @@ import Cart from "./pages/Cart";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import Orders from "./pages/Orders";
+import OrderDetail from "./pages/OrderDetail";
 import NotFound from "./pages/NotFound";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ROUTES } from "./config/navigation";
+import ScrollToTop from "./components/ScrollToTop";
+import OrderConfirmation from "./pages/OrderConfirmation";
 
 export default function App() {
   return (
     <AuthProvider>
       <CartProvider>
         <BrowserRouter>
+          <ScrollToTop />
           <ErrorBoundary>
             <Toaster
               position="top-center"
@@ -35,9 +39,9 @@ export default function App() {
 
               <Route element={<MainLayout />}>
                 <Route path={ROUTES.home} element={<Products />} />
-                <Route path={ROUTES.shop.substring(1)} element={<Products />} />
+                <Route path={ROUTES.shop} element={<Products />} />
                 <Route
-                  path={`${ROUTES.product.substring(1)}/:slug`}
+                  path={`${ROUTES.product}/:slug`}
                   element={<ProductDetail />}
                 />
                 <Route
@@ -46,15 +50,17 @@ export default function App() {
                 />
 
                 <Route element={<ProtectedRoute />}>
-                  <Route path={ROUTES.cart.substring(1)} element={<Cart />} />
+                  <Route path={ROUTES.cart} element={<Cart />} />
+                  <Route path={ROUTES.orders} element={<Orders />} />
                   <Route
-                    path={ROUTES.orders.substring(1)}
-                    element={<Orders />}
+                    path={`${ROUTES.orders}/:id`}
+                    element={<OrderDetail />}
                   />
                   <Route
-                    path={ROUTES.profile.substring(1)}
-                    element={<Profile />}
+                    path="order-confirmation/:id"
+                    element={<OrderConfirmation />}
                   />
+                  <Route path={ROUTES.profile} element={<Profile />} />
                 </Route>
                 <Route path="*" element={<NotFound />} />
               </Route>

@@ -1,7 +1,106 @@
+import { Link } from "react-router-dom";
+import { Sprout } from "lucide-react";
+import { useOrders } from "../hooks/useOrders";
+import { SubPageHeader } from "../components/ui/SubPageHeader";
+import { LoadingSkeleton } from "../components/ui/LoadingSkeleton";
+import { EmptyState } from "../components/ui/EmptyState";
+import { ROUTES, orderPath } from "../config/navigation";
+import { COPY } from "../config/copy";
+import { formatINR } from "../config/constants";
+
+const statusStyles = {
+  pending: "bg-amber-100 text-amber-700",
+  delivered: "bg-leaf-100 text-leaf-700",
+  cancelled: "bg-tomato-100 text-tomato-600",
+};
+
 export default function Orders() {
+  const { orders, loading, error } = useOrders();
+
+  if (loading) {
+    return <LoadingSkeleton />;
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-20 text-muted">
+        <p className="mb-3">{error}</p>
+        <Link to={ROUTES.shop} className="text-leaf-700 underline">
+          {COPY.backToShop}
+        </Link>
+      </div>
+    );
+  }
+
+  if (orders.length === 0) {
+    return (
+      <EmptyState
+        icon={<Sprout size={32} className="text-leaf-400" />}
+        title="No orders yet"
+        message={COPY.cartEmptyHint}
+        actionLabel={COPY.cartStartShopping}
+        actionTo={ROUTES.shop}
+      />
+    );
+  }
+
   return (
-    <div className="p-5 text-text-muted text-sm">
-      Order history coming soon.
+    <div className="pb-10">
+      <SubPageHeader title="My Orders" backTo={ROUTES.profile} />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+        {orders.map((order) => (
+          <Link
+            key={order.id}
+            to={orderPath(order.id)}
+            className="block bg-surface rounded-card shadow-card p-4 hover:shadow-card-hover transition-shadow cursor-pointer"
+          >
+            <div className="flex items-center justify-between mb-1">
+              <span className="font-medium text-ink">Order #{order.id}</span>
+              <span
+                className={`text-xs font-medium px-2 py-0.5 rounded-pill ${
+                  statusStyles[order.status] ||
+                  "bg-surface-secondary text-text-body"
+                }`}
+              >
+                {order.status}
+              </span>
+            </div>
+
+            <div className="flex justify-between text-sm text-body">
+              <span>
+                {new Date(order.ordered_at).toLocaleDateString("en-IN", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                })}
+              </span>
+              <span className="font-semibold text-leaf-700">
+                {formatINR(order.total)}
+              </span>
+            </div>
+
+            {order.thumbnails?.length > 0 ? (
+              <div className="flex -space-x-2 mt-3">
+                {order.thumbnails.slice(0, 3).map((url, i) => (
+                  <img
+                    key={i}
+                    src={url}
+                    alt=""
+                    className="w-8 h-8 rounded-full border-2 border-surface object-cover"
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="flex -space-x-2 mt-3">
+                <div className="w-8 h-8 rounded-full border-2 border-surface bg-leaf-100 flex items-center justify-center">
+                  <Sprout size={14} className="text-leaf-600" />
+                </div>
+              </div>
+            )}
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }

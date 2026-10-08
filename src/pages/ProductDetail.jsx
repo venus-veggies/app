@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChevronLeft, Truck, Leaf as LeafIcon, Hand } from "lucide-react";
+import { Truck, Leaf as LeafIcon, Hand } from "lucide-react";
 import { QuantityStepper } from "../components/ui/QuantityStepper";
 import { Button } from "../components/ui/Button";
-import { ProduceBadge } from "../components/product";
+import { SubPageHeader } from "../components/ui/SubPageHeader";
 import { getProducts } from "../data/products";
 import { useProduct } from "../hooks/useProduct";
 import { useAddToCart } from "../hooks/useAddToCart";
 import useDocumentTitle from "../hooks/useDocumentTitle";
 import { ROUTES } from "../config/navigation";
 import { COPY } from "../config/copy";
+import { formatINR } from "../config/constants";
+import ProduceBadge from "../components/product/ProduceBadge";
 
 const FACTS = [
   { icon: LeafIcon, label: COPY.farmFresh },
@@ -74,6 +76,7 @@ export default function ProductDetail() {
   const tagName = product.tags?.[0]?.name;
 
   const handleAdd = () => {
+    if (!selectedVariant) return;
     addToCart(
       {
         slug: product.slug,
@@ -88,6 +91,8 @@ export default function ProductDetail() {
 
   return (
     <div className="pb-6">
+      <SubPageHeader title={product.name} backTo={ROUTES.shop} />
+
       <div className="relative -mx-4 -mt-4 md:mx-0 md:mt-0 md:rounded-card overflow-hidden h-64 md:h-72 bg-leaf-100/60">
         {product.image_url ? (
           <img
@@ -111,13 +116,6 @@ export default function ProductDetail() {
             </svg>
           </div>
         )}
-        <button
-          onClick={() => navigate(-1)}
-          aria-label={COPY.goBackAria}
-          className="absolute top-4 left-4 w-9 h-9 rounded-full bg-surface/90 backdrop-blur flex items-center justify-center shadow-card"
-        >
-          <ChevronLeft size={20} className="text-ink" />
-        </button>
         {tagName && (
           <ProduceBadge
             label={tagName}
@@ -134,7 +132,7 @@ export default function ProductDetail() {
         <p className="type-caption mb-3">{unit}</p>
 
         <div className="flex items-center gap-3 mb-4">
-          <span className="type-price-lg">₹{price}</span>
+          <span className="type-price-lg">{formatINR(price)}</span>
         </div>
 
         {activeVariants.length > 1 && (
@@ -179,9 +177,15 @@ export default function ProductDetail() {
 
       <div className="fixed bottom-[var(--bottomnav-height)] md:bottom-0 inset-x-0 z-30 bg-surface/95 backdrop-blur border-t border-border p-3 safe-bottom">
         <div className="max-w-6xl mx-auto">
-          <Button className="w-full py-3" onClick={handleAdd}>
-            Add {qty > 1 ? `${qty} ` : ""}to cart · ₹{price * qty}
-          </Button>
+          {activeVariants.length > 0 ? (
+            <Button className="w-full py-3" onClick={handleAdd}>
+              Add {qty > 1 ? `${qty} ` : ""}to cart · {formatINR(price * qty)}
+            </Button>
+          ) : (
+            <div className="text-center text-sm text-tomato-600 bg-tomato-100 rounded-btn py-3">
+              Currently unavailable
+            </div>
+          )}
         </div>
       </div>
     </div>

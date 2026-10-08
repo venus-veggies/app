@@ -1,16 +1,25 @@
-import { Link, NavLink } from "react-router-dom";
+import { useState } from "react";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+
 import { NAV_ICONS, NAV_LINKS, ROUTES } from "../../config/navigation";
-import { BRAND } from "../../content/brand";
 import { useCart } from "../../context/CartContext";
 import { COPY } from "../../config/copy";
 
 const navLinkClass = ({ isActive }) =>
-  `text-sm font-medium transition-colors ${isActive ? "text-leaf-700" : "text-body hover:text-leaf-700"}`;
+  `text-sm font-medium transition-colors ${
+    isActive ? "text-leaf-700" : "text-body hover:text-leaf-700"
+  }`;
 
 export default function TopNav() {
   const { totalCount } = useCart();
   const LogoIcon = NAV_ICONS.logo;
   const LocationIcon = NAV_ICONS.location;
+  const navigate = useNavigate();
+  const [search, setSearch] = useState("");
+
+  const desktopTextLinks = NAV_LINKS.filter(
+    (link) => link.key !== "cart" && link.key !== "profile",
+  );
 
   return (
     <header className="sticky top-0 z-40 bg-surface/95 backdrop-blur border-b border-border">
@@ -21,25 +30,24 @@ export default function TopNav() {
             <LogoIcon size={18} strokeWidth={2.5} />
           </span>
           <span className="font-display text-lg font-semibold text-leaf-900 hidden sm:inline">
-            Venus
+            Venus Veggies
           </span>
         </Link>
 
         {/* Delivery pill – mobile only */}
-        <div className="md:hidden flex items-center gap-1 text-xs text-body bg-leaf-100 rounded-pill px-3 py-1.5">
-          <LocationIcon size={13} className="text-leaf-700" />
-          <span>{BRAND.deliveryPromise}</span>
-        </div>
+        <button
+          type="button"
+          onClick={() => {}} // TODO: wire address selector
+          className="md:hidden flex items-center gap-1.5 text-xs text-leaf-900 bg-leaf-100 rounded-pill px-3 py-1.5 shrink-0 max-w-[200px]"
+        >
+          <LocationIcon size={14} className="text-leaf-700 shrink-0" />
+          <span className="truncate">Sainik Colony</span>
+        </button>
 
-        {/* Desktop nav links */}
+        {/* Desktop text links */}
         <nav className="hidden md:flex items-center gap-6 ml-2">
-          {NAV_LINKS.map(({ key, label, path }) => (
-            <NavLink
-              key={key}
-              to={path}
-              end={key === "shop"}
-              className={navLinkClass}
-            >
+          {desktopTextLinks.map(({ key, label, path, end }) => (
+            <NavLink key={key} to={path} end={end} className={navLinkClass}>
               {label}
             </NavLink>
           ))}
@@ -50,14 +58,24 @@ export default function TopNav() {
           <NAV_ICONS.search size={16} className="text-muted" />
           <input
             placeholder={COPY.searchPlaceholder}
+            value={search}
+            onChange={(e) => {
+              const value = e.target.value;
+              setSearch(value);
+              navigate(
+                value ? `/shop?search=${encodeURIComponent(value)}` : "/shop",
+                { replace: true },
+              );
+            }}
             className="bg-transparent text-sm outline-none placeholder:text-muted w-full"
           />
         </div>
 
-        {/* Cart + profile icons – DESKTOP ONLY */}
+        {/* Cart + profile icons – desktop only */}
         <div className="hidden md:flex items-center gap-1 ml-auto md:ml-4">
           <Link
             to={ROUTES.cart}
+            aria-label="Cart"
             className="relative w-10 h-10 rounded-full flex items-center justify-center hover:bg-leaf-100 transition-colors"
           >
             <NAV_ICONS.cart size={20} className="text-ink" />
@@ -67,8 +85,10 @@ export default function TopNav() {
               </span>
             )}
           </Link>
+
           <Link
             to={ROUTES.profile}
+            aria-label="Profile"
             className="hidden md:flex w-10 h-10 rounded-full items-center justify-center hover:bg-leaf-100 transition-colors"
           >
             <NAV_ICONS.profile size={20} className="text-ink" />

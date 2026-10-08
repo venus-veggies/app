@@ -8,7 +8,7 @@ export function QuantityStepper({ value, onChange, min = 0, className = "" }) {
     >
       <button
         onClick={() => onChange(Math.max(min, value - 1))}
-        className="w-6 h-6 rounded-full bg-surface flex items-center justify-center text-ink shadow-card"
+        className="w-6 h-6 rounded-full bg-surface flex items-center justify-center text-ink shadow-card transition-transform active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf-300"
         aria-label={COPY.quantityDecreaseAria}
       >
         <Minus size={12} />
@@ -18,7 +18,7 @@ export function QuantityStepper({ value, onChange, min = 0, className = "" }) {
       </span>
       <button
         onClick={() => onChange(value + 1)}
-        className="w-6 h-6 rounded-full bg-leaf-500 flex items-center justify-center text-white"
+        className="w-6 h-6 rounded-full bg-leaf-500 flex items-center justify-center text-white shadow-sm transition-transform active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf-300"
         aria-label={COPY.quantityIncreaseAria}
       >
         <Plus size={12} />

@@ -2,7 +2,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 const api = axios.create({
-  baseURL: "/api/v1",
+  baseURL: import.meta.env.VITE_API_BASE_URL || "/api/v1",
   headers: { Accept: "application/json" },
 });
 
@@ -17,11 +17,17 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // Ignore aborted requests – these are expected during search/filter
+    if (error.code === "ERR_CANCELED" || error.name === "AbortError") {
+      return Promise.reject(error);
+    }
+
     // Don't toast on 401 (let the auth flow handle it)
     if (error.response?.status !== 401) {
       const msg = error.response?.data?.message || "Something went wrong";
       toast.error(msg);
     }
+
     return Promise.reject(error);
   },
 );

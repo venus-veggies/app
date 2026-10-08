@@ -7,74 +7,38 @@ import {
   useCallback,
 } from "react";
 import { useAuth } from "./AuthContext";
+import {
+  getCartKey,
+  loadAndMergeGuestCart,
+  saveCart,
+} from "../utils/cartStorage";
 
 const CartContext = createContext(null);
-
-const GUEST_KEY = "cart_guest";
 
 export function CartProvider({ children }) {
   const { user } = useAuth();
   const [items, setItems] = useState({});
 
-  // Determine which localStorage key to use
-  const storageKey = user ? `cart_${user.id}` : GUEST_KEY;
+  const storageKey = getCartKey(user);
 
-  // Load cart from storage when key changes (including guest)
+  // Load cart and merge guest cart when storageKey or user changes
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(storageKey);
-      if (saved) {
-        setItems(JSON.parse(saved));
-      } else {
-        setItems({});
-      }
-    } catch {
-      setItems({});
-    }
-  }, [storageKey]);
+    setItems(loadAndMergeGuestCart(storageKey, user));
+  }, [storageKey, user]);
 
   // Save cart whenever items change
   useEffect(() => {
-    if (Object.keys(items).length === 0) {
-      localStorage.removeItem(storageKey);
-    } else {
-      localStorage.setItem(storageKey, JSON.stringify(items));
-    }
+    saveCart(storageKey, items);
   }, [items, storageKey]);
 
-  // Merge guest cart into user cart on login
-  useEffect(() => {
-    if (user) {
-      const guestCart = localStorage.getItem(GUEST_KEY);
-      if (guestCart) {
-        try {
-          const guestItems = JSON.parse(guestCart);
-          if (Object.keys(guestItems).length > 0) {
-            setItems((prev) => {
-              const merged = { ...prev };
-              for (const [key, guestEntry] of Object.entries(guestItems)) {
-                if (merged[key]) {
-                  merged[key].qty += guestEntry.qty;
-                } else {
-                  merged[key] = guestEntry;
-                }
-              }
-              return merged;
-            });
-          }
-          localStorage.removeItem(GUEST_KEY);
-        } catch {
-          localStorage.removeItem(GUEST_KEY);
-        }
-      }
-    }
-  }, [user]);
-
-  const addItem = useCallback((product, qty = 1) => {
+  const addItem = useCallback((product, qty = 1, selectedVariant = null) => {
     setItems((prev) => {
-      const key = product.slug; // <-- slug, not id
+      const variant = selectedVariant || product.variant || null;
+      const key = variant?.id ? `${product.slug}_${variant.id}` : product.slug;
+
       const existing = prev[key];
       const nextQty = (existing?.qty ?? 0) + qty;
+
       return {
         ...prev,
         [key]: {
@@ -82,8 +46,15 @@ export function CartProvider({ children }) {
             slug: product.slug,
             name: product.name,
             image_url: product.image_url,
-            price: product.price,
-            variant: product.variant,
+            price: variant?.current_price ?? product.price ?? 0,
+            variant: variant
+              ? {
+                  id: variant.id,
+                  label: variant.display_label || variant.label || null,
+                  price: variant.current_price ?? variant.price ?? null,
+                  unit: variant.quantity_unit || variant.unit || null,
+                }
+              : null,
           },
           qty: nextQty,
         },
@@ -91,21 +62,22 @@ export function CartProvider({ children }) {
     });
   }, []);
 
-  const setQty = useCallback((productSlug, qty) => {
-    // <-- takes slug
+  const setQty = useCallback((itemKey, qty) => {
     setItems((prev) => {
       if (qty <= 0) {
-        const { [productSlug]: _drop, ...rest } = prev;
+        const { [itemKey]: _drop, ...rest } = prev;
         return rest;
       }
-      return { ...prev, [productSlug]: { ...prev[productSlug], qty } };
+      return {
+        ...prev,
+        [itemKey]: { ...prev[itemKey], qty },
+      };
     });
   }, []);
 
-  const removeItem = useCallback((productSlug) => {
-    // <-- takes slug
+  const removeItem = useCallback((itemKey) => {
     setItems((prev) => {
-      const { [productSlug]: _drop, ...rest } = prev;
+      const { [itemKey]: _drop, ...rest } = prev;
       return rest;
     });
   }, []);
@@ -114,25 +86,64 @@ export function CartProvider({ children }) {
     setItems({});
   }, []);
 
-  const lineItems = useMemo(() => Object.values(items), [items]);
+  const updateItemPrice = useCallback((itemKey, newPrice) => {
+    setItems((prev) => {
+      if (!prev[itemKey]) return prev;
+
+      return {
+        ...prev,
+        [itemKey]: {
+          ...prev[itemKey],
+          product: {
+            ...prev[itemKey].product,
+            price: newPrice,
+          },
+        },
+      };
+    });
+  }, []);
+
+  const lineItems = useMemo(
+    () =>
+      Object.entries(items).map(([key, entry]) => ({
+        key,
+        ...entry,
+      })),
+    [items],
+  );
+
   const totalCount = useMemo(
     () => lineItems.reduce((sum, l) => sum + l.qty, 0),
     [lineItems],
   );
+
   const subtotal = useMemo(
     () => lineItems.reduce((sum, l) => sum + l.qty * (l.product.price ?? 0), 0),
     [lineItems],
   );
 
-  const value = {
-    lineItems,
-    totalCount,
-    subtotal,
-    addItem,
-    setQty,
-    removeItem,
-    clearCart,
-  };
+  const value = useMemo(
+    () => ({
+      lineItems,
+      totalCount,
+      subtotal,
+      addItem,
+      setQty,
+      removeItem,
+      clearCart,
+      updateItemPrice,
+    }),
+    [
+      lineItems,
+      totalCount,
+      subtotal,
+      addItem,
+      setQty,
+      removeItem,
+      clearCart,
+      updateItemPrice,
+    ],
+  );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
