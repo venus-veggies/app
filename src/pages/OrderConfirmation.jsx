@@ -107,7 +107,7 @@ export default function OrderConfirmation() {
             <p className="text-sm text-body">{order.address || "—"}</p>
           </div>
 
-          <div className="bg-leaf-100/60 rounded-card p-4 border border-leaf-200">
+          <div className="bg-surface rounded-card shadow-card p-4">
             <h2 className="type-section mb-1">Expected Delivery</h2>
             <p className="text-sm text-leaf-900 font-medium">{DELIVERY_NOTE}</p>
           </div>

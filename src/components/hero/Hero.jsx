@@ -43,12 +43,15 @@ export default function Hero() {
           </div>
         </div>
         <div className="relative order-first md:order-last">
-          <img
-            src="/images/vegetable-basket.png"
-            alt="Fresh vegetable basket"
-            className="w-full aspect-[3/2] md:aspect-[16/10] object-cover object-top rounded-card"
-            loading="eager"
-          />
+          <picture>
+            <source srcSet="/images/vegetable-basket.webp" type="image/webp" />
+            <img
+              src="/images/vegetable-basket.jpg"
+              alt="Fresh vegetable basket"
+              className="w-full aspect-[3/2] md:aspect-[16/10] object-cover object-top rounded-card"
+              loading="eager"
+            />
+          </picture>
         </div>
       </div>
     </div>

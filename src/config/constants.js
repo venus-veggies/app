@@ -9,5 +9,5 @@ export function formatINR(amount) {
   return `₹${Math.round(num).toLocaleString("en-IN")}`;
 }
 
-export const DELIVERY_TIME = "7:00 AM";
-export const DELIVERY_NOTE = `Delivered fresh next morning by ${DELIVERY_TIME}`;
+export const DELIVERY_TIME = "10:00 AM";
+export const DELIVERY_NOTE = `Delivered fresh next morning before ${DELIVERY_TIME}`;

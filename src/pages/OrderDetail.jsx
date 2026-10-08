@@ -207,8 +207,39 @@ export default function OrderDetail() {
             if (!customerNote) return null;
             return (
               <div className="bg-surface rounded-card shadow-card p-4">
-                <h2 className="type-section mb-2">Your Note</h2>
-                <p className="text-sm text-body">{customerNote.body}</p>
+                <h2 className="type-section mb-3">Your Note</h2>
+
+                {/* Original customer note */}
+                <div className="border-l-2 border-leaf-300 pl-3">
+                  <p className="text-xs text-muted mb-1">
+                    You ·{" "}
+                    {new Date(customerNote.created_at).toLocaleDateString(
+                      "en-IN",
+                      {
+                        day: "numeric",
+                        month: "short",
+                      },
+                    )}
+                  </p>
+                  <p className="text-sm text-body">{customerNote.body}</p>
+                </div>
+
+                {/* Admin replies */}
+                {(customerNote.replies || []).map((reply) => (
+                  <div
+                    key={reply.id}
+                    className="border-l-2 border-leaf-100 pl-3 mt-3"
+                  >
+                    <p className="text-xs text-muted mb-1">
+                      Venus Veggies ·{" "}
+                      {new Date(reply.created_at).toLocaleDateString("en-IN", {
+                        day: "numeric",
+                        month: "short",
+                      })}
+                    </p>
+                    <p className="text-sm text-body">{reply.body}</p>
+                  </div>
+                ))}
               </div>
             );
           })()}

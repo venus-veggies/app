@@ -30,7 +30,7 @@ export default function TopNav() {
             <LogoIcon size={18} strokeWidth={2.5} />
           </span>
           <span className="font-display text-lg font-semibold text-leaf-900 hidden sm:inline">
-            Venus
+            Venus Veggies
           </span>
         </Link>
 

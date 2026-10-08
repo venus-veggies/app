@@ -12,14 +12,15 @@ lerna-debug.log*
 node_modules
 
 # Build output
-dist
+# dist (uncommented for deployment — built files are committed)
 dist-ssr
 
 # Environment secrets
 .env
 .env.local
 .env.*.local
-
+.env.development
+.env.production
 # Editor files
 .vscode/*
 !.vscode/extensions.json
