@@ -102,7 +102,7 @@ export default function Cart() {
 
         <div className="space-y-4">
           <OrderSummary subtotal={subtotal} />
-          <CheckoutForm subtotal={subtotal} />
+          <CheckoutForm />
         </div>
       </div>
     </div>

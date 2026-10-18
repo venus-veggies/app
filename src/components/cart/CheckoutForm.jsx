@@ -9,10 +9,9 @@ import { PaymentMethodSelector } from "./PaymentMethodSelector";
 import { placeOrder } from "../../data/orders";
 import { ROUTES } from "../../config/navigation";
 import { COPY } from "../../config/copy";
-import { DELIVERY_FEE, FREE_DELIVERY_THRESHOLD } from "../../config/constants";
 import api from "../../api/client";
 
-export function CheckoutForm({ subtotal }) {
+export function CheckoutForm() {
   const { lineItems, clearCart } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -51,16 +50,19 @@ export function CheckoutForm({ subtotal }) {
       return;
     }
 
-    const delivery = subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE;
-    const totalAmount = subtotal + delivery;
-
     if (paymentMethod === "online") {
       try {
+        // Step 1: Server computes total and creates Razorpay order
+        // Returns a PaymentAttempt that will be completed in step 2
         const razorpayResponse = await api.post(
           "/orders/create-razorpay-order",
           {
-            amount: totalAmount,
-            receipt: `order_${Date.now()}`,
+            items,
+            address_line1: address.address_line1,
+            address_line2: address.address_line2,
+            landmark: address.landmark,
+            pincode: address.pincode,
+            note,
           },
         );
         const {
@@ -80,17 +82,12 @@ export function CheckoutForm({ subtotal }) {
           handler: async function (response) {
             setPlacing(true);
             try {
+              // Step 2: Server rebuilds order from PaymentAttempt snapshot
               const orderResult = await placeOrder({
-                address_line1: address.address_line1,
-                address_line2: address.address_line2,
-                landmark: address.landmark,
-                pincode: address.pincode,
                 payment_method: "online",
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
-                note,
-                items,
               });
 
               clearCart();
@@ -122,7 +119,7 @@ export function CheckoutForm({ subtotal }) {
       return;
     }
 
-    // COD
+    // COD — unchanged
     setPlacing(true);
     try {
       const orderResult = await placeOrder({

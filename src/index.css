@@ -201,5 +201,15 @@ body {
   overscroll-behavior-y: contain;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
-  user-select: none;
 }
+
+/* Prevent accidental highlight on taps of buttons/links — but nothing else */
+button,
+a,
+label,
+[role="button"] {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Everything else (text, paragraphs, inputs) stays selectable by default */
