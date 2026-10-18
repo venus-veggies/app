@@ -16,6 +16,7 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ROUTES } from "./config/navigation";
 import ScrollToTop from "./components/ScrollToTop";
 import OrderConfirmation from "./pages/OrderConfirmation";
+import { UpdatePrompt } from "./components/UpdatePrompt";
 
 export default function App() {
   return (
@@ -34,6 +35,7 @@ export default function App() {
                 },
               }}
             />
+            <UpdatePrompt />
             <Routes>
               <Route path={ROUTES.login} element={<Login />} />
 
