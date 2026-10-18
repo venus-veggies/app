@@ -35,14 +35,8 @@ export class ErrorBoundary extends Component {
           <p className="text-muted mb-5">{COPY.errorBoundaryDescription}</p>
 
           <p className="text-sm text-body mb-6 max-w-md">
-            If the problem continues, please contact{" "}
-            <a
-              href={`mailto:${SUPPORT_EMAIL}`}
-              className="text-leaf-700 underline"
-            >
-              {SUPPORT_EMAIL}
-            </a>{" "}
-            or report the issue below — we’ll get back to you quickly.
+            If the problem continues, please contact us at +91-9315611976 or
+            report the issue below — we’ll get back to you quickly.
           </p>
 
           <div className="flex gap-3">
