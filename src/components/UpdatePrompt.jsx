@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useRegisterSW } from "virtual:pwa-register/react";
 import api from "../api/client";
 
-const POLL_INTERVAL = 5 * 60 * 1000; // 5 minutes
+const POLL_INTERVAL = 5 * 60 * 1000;
 
 export function UpdatePrompt() {
   const [dismissed, setDismissed] = useState(false);
@@ -16,13 +16,11 @@ export function UpdatePrompt() {
   } = useRegisterSW({
     onRegisteredSW(swUrl, registration) {
       if (registration) {
-        // Poll for a new SW every 5 minutes
         setInterval(() => registration.update(), POLL_INTERVAL);
       }
     },
   });
 
-  // Poll the version endpoint to detect deploys even when the SW check was skipped
   useEffect(() => {
     let cancelled = false;
 
@@ -31,7 +29,7 @@ export function UpdatePrompt() {
         const { data } = await api.get("/app-version");
         if (!cancelled) setServerVersion(data);
       } catch {
-        // Network error — ignore, will retry next interval
+        // ignore
       }
     };
 
@@ -47,17 +45,29 @@ export function UpdatePrompt() {
   const versionMismatch =
     serverVersion && serverVersion.version !== localVersion;
 
-  // CRITICAL UPDATE: activate the new SW automatically without asking
   useEffect(() => {
     if (needRefresh && serverVersion?.critical) {
       updateServiceWorker(true);
     }
   }, [needRefresh, serverVersion, updateServiceWorker]);
 
-  // Reset dismissal whenever a new update is detected
   useEffect(() => {
     if (needRefresh || versionMismatch) setDismissed(false);
   }, [needRefresh, versionMismatch]);
+
+  const handleUpdate = async () => {
+    if (needRefresh) {
+      try {
+        await updateServiceWorker(true);
+        setTimeout(() => window.location.reload(), 300);
+      } catch (err) {
+        console.error("SW activation failed, forcing reload", err);
+        window.location.reload();
+      }
+    } else {
+      window.location.reload();
+    }
+  };
 
   const showBanner = (needRefresh || versionMismatch) && !dismissed;
 
@@ -68,14 +78,14 @@ export function UpdatePrompt() {
       <div className="flex-1">
         <p className="text-sm font-medium">New version available</p>
         <p className="text-xs text-white/70 mt-0.5">
-          Refresh to get the latest updates
+          Download to get the latest updates
         </p>
       </div>
       <button
-        onClick={() => updateServiceWorker(true)}
+        onClick={handleUpdate}
         className="shrink-0 px-3 py-1.5 rounded-btn bg-leaf-500 text-white text-sm font-semibold hover:bg-leaf-600 transition"
       >
-        Refresh
+        Update
       </button>
       <button
         onClick={() => setDismissed(true)}
