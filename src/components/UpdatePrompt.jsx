@@ -5,6 +5,8 @@ import api from "../api/client";
 const POLL_INTERVAL = 5 * 60 * 1000;
 
 export function UpdatePrompt() {
+  const isDev = import.meta.env.DEV;
+
   const [dismissed, setDismissed] = useState(false);
   const [serverVersion, setServerVersion] = useState(null);
 
@@ -22,6 +24,9 @@ export function UpdatePrompt() {
   });
 
   useEffect(() => {
+    // In development, there is no real deployed version to compare against.
+    if (isDev) return;
+
     let cancelled = false;
 
     const checkVersion = async () => {
@@ -40,16 +45,16 @@ export function UpdatePrompt() {
       cancelled = true;
       clearInterval(interval);
     };
-  }, []);
+  }, [isDev]);
 
   const versionMismatch =
-    serverVersion && serverVersion.version !== localVersion;
+    !isDev && serverVersion && serverVersion.version !== localVersion;
 
   useEffect(() => {
-    if (needRefresh && serverVersion?.critical) {
+    if (needRefresh && serverVersion?.critical && !isDev) {
       updateServiceWorker(true);
     }
-  }, [needRefresh, serverVersion, updateServiceWorker]);
+  }, [needRefresh, serverVersion, updateServiceWorker, isDev]);
 
   useEffect(() => {
     if (needRefresh || versionMismatch) setDismissed(false);
@@ -69,7 +74,7 @@ export function UpdatePrompt() {
     }
   };
 
-  const showBanner = (needRefresh || versionMismatch) && !dismissed;
+  const showBanner = !isDev && (needRefresh || versionMismatch) && !dismissed;
 
   if (!showBanner) return null;
 
