@@ -4,6 +4,7 @@ import { Search, SlidersHorizontal, Sprout } from "lucide-react";
 import { getCategories } from "../data/products";
 import { useProducts } from "../hooks/useProducts";
 import ProductCard from "../components/product/ProductCard";
+import CategoryTile from "../components/product/CategoryTile";
 import Hero from "../components/hero/Hero";
 import useDocumentTitle from "../hooks/useDocumentTitle";
 import { LoadingSkeleton } from "../components/ui/LoadingSkeleton";
@@ -39,7 +40,31 @@ export default function Products() {
   }, [searchParams]);
 
   // Derive parent and child categories
-  const parentCategories = categories.filter((c) => !c.parent_id);
+  const parentCategories = categories
+    .filter((c) => !c.parent_id)
+    .sort((a, b) => {
+      const aName = a.name.toLowerCase();
+      const bName = b.name.toLowerCase();
+
+      // Business priority: Vegetables = 1, Fruits = 2, everything else = 99
+      const aPriority = aName.includes("vegetable")
+        ? 1
+        : aName.includes("fruit")
+          ? 2
+          : 99;
+      const bPriority = bName.includes("vegetable")
+        ? 1
+        : bName.includes("fruit")
+          ? 2
+          : 99;
+
+      if (aPriority !== bPriority) {
+        return aPriority - bPriority;
+      }
+
+      // Fallback to alphabetical for the rest
+      return a.name.localeCompare(b.name);
+    });
   const selectedParentId = parentCategories.find(
     (c) => c.slug === selectedParent,
   )?.id;
@@ -72,30 +97,21 @@ export default function Products() {
         <SlidersHorizontal size={16} className="text-muted shrink-0" />
       </div>
 
-      {/* Parent categories */}
-      <div className="flex gap-2 overflow-x-auto no-scrollbar mb-3">
-        <button
+      {/* Parent categories — photo tiles */}
+      <div className="flex gap-3 overflow-x-auto no-scrollbar mb-4 -mx-4 px-4 pb-2">
+        <CategoryTile
+          name={COPY.categoryAll}
+          isActive={selectedParent === ""}
           onClick={() => handleParentClick("")}
-          className={`shrink-0 text-sm font-medium px-4 py-1.5 rounded-pill border ${
-            selectedParent === ""
-              ? "bg-leaf-500 border-leaf-500 text-white"
-              : "bg-surface border-border text-body hover:border-leaf-400"
-          }`}
-        >
-          {COPY.categoryAll}
-        </button>
+        />
         {parentCategories.map((c) => (
-          <button
+          <CategoryTile
             key={c.slug}
+            name={c.name}
+            imageUrl={c.image_url}
+            isActive={selectedParent === c.slug}
             onClick={() => handleParentClick(c.slug)}
-            className={`shrink-0 text-sm font-medium px-4 py-1.5 rounded-pill border transition-colors ${
-              selectedParent === c.slug
-                ? "bg-leaf-500 border-leaf-500 text-white"
-                : "bg-surface border-border text-body hover:border-leaf-400"
-            }`}
-          >
-            {c.name}
-          </button>
+          />
         ))}
       </div>
 
