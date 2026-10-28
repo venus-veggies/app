@@ -50,10 +50,12 @@ export default function CategoryTile({ name, imageUrl, isActive, onClick }) {
       }`}
     >
       <div
-        className="w-[76px] h-[76px] rounded-xl overflow-hidden flex items-center justify-center"
+        className={`w-[76px] h-[76px] rounded-xl overflow-hidden flex items-center justify-center ${
+          imageUrl ? "bg-white" : ""
+        }`}
         style={{
           backgroundColor: bgColor,
-          boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.04)",
+          boxShadow: imageUrl ? "none" : "inset 0 0 0 1px rgba(0,0,0,0.04)",
         }}
       >
         {imageUrl ? (
